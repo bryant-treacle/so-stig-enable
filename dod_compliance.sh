@@ -21,9 +21,11 @@
 welcome_script()
 {
 cat << EOF 
+
 This script will make the following changes to Security Onion 16.04 in order to meet DoD RMF Requirements:
     - Add DoD login banner
-    - Lock account after 3 failed login attempts    
+    - Lock account after 3 failed login attempts
+    - Enforce DoD password complexity (Server and Applications)
 
 EOF
 }
@@ -61,6 +63,13 @@ echo ""
 echo "Configuring password Complexity to DoD standard"
 sudo cp common-password /etc/pam.d/common-password
 sudo dpkg -i libpam-cracklib_1.1.8-3.2ubuntu2_amd64.deb
+echo ""
+echo "Moving old so-user-add script to /usr/sbin/.so-user-add.bak
+sudo mv /usr/sbin/so-user-add /usr/sbin/.so-user-add.bak
+echo ""
+echo "Adding new so-user-add script"
+sudo cp dod_sguil_password.sh /usr/sbin/so-user-add
+sudo chmod 755 /usr/sbin/so-user-add
 }
 
 #################################
