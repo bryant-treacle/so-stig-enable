@@ -16,7 +16,8 @@
 # Author: Bryant Treacle
 # Date Created: 2018-11-16
 # Date last modified: 2018-11-16
-# Purpose: This script will replace the so-user-add script in Security Onion to enforce DoD complient password policies.
+# Purpose: This script will replace the so-user-add script in Security Onion to enforce DoD compliant password policies.
+# Note: After install the original so-user-add script will be moved to /usr/sbin/.so-user-add.bak
 
 ###########################
 #  elevated access check  #
