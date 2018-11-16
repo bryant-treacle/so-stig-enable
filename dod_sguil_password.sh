@@ -18,6 +18,14 @@
 # Date last modified: 2018-11-16
 # Purpose: This script will replace the so-user-add script in Security Onion to enforce DoD complient password policies.
 
+###########################
+#  elevated access check  #
+###########################
+
+if [[ $(/usr/bin/id -u) -ne 0 ]]; then
+    echo "This script must be run as root."
+    exit
+    
 #######################
 #  User Name function #
 #######################
