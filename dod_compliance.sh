@@ -36,6 +36,7 @@ EOF
 login_banner()
 {
 echo "Adding DoD login Message Banner"
+# This will create a SSH login banner
 # Move login banner to /etc directory
 sudo cp dod_login_banner /etc/dod_login_banner
 
