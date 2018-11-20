@@ -43,6 +43,12 @@ sudo cp dod_login_banner /etc/dod_login_banner
 # Add banner file location to sshd_config
 sudo sed -i 's|#Banner /etc/issue.net|Banner /etc/dod_login_banner|g' /etc/ssh/sshd_config
 sudo systemctl restart sshd
+
+# This will add a DoD consent splash page for web access
+# This only works because Apache2 will load index.html before index.php.  This can be modified in the
+# /etc/apache2/mods-enabled/dir.conf
+sudo cp index.html /var/www/so/
+sudo cp dod_banner.css /var/www/so/css
 }
 
 ########################
