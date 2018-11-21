@@ -49,6 +49,9 @@ sudo systemctl restart sshd
 # /etc/apache2/mods-enabled/dir.conf
 sudo cp index.html /var/www/so/
 sudo cp dod_banner.css /var/www/so/css
+
+# DoD consent Splash Page for gnome login.
+sudo cp 50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
 }
 
 ########################
