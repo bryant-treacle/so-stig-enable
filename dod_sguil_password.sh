@@ -26,7 +26,7 @@
 if [[ $(/usr/bin/id -u) -ne 0 ]]; then
     echo "This script must be run as root."
     exit
-    
+fi 
 #######################
 #  User Name function #
 #######################
@@ -40,6 +40,8 @@ if [[ "$USER_NAME" =~ [^a-zA-Z0-9] ]]; then
     echo ""
     echo "The Username must contain only alpha-numeric characters."
     dod_user_name
+else
+    dod_user_pass
 fi
 }
 ################################
@@ -48,7 +50,7 @@ fi
 dod_user_pass()
 {
 echo "Please enter a password following DoD guidance."
-read -p -s "User Password: " USER_PASS
+read -s -p "User Password: " USER_PASS
 #Check if the password Length is greater or equal to 15 characters
 if [[ ${#USER_PASS} -ge 15 ]]; then
     # Check if the password has at least 2 upper case letters
@@ -82,7 +84,7 @@ fi
 dod_user_pass_verify()
 {
 echo "Please verify password."
-read -p -s "verify: " USER_PASS
+read -s -p "verify: " USER_PASS_VERIFY
 #Check if the password Length is greater or equal to 15 characters
 if [[ ${#USER_PASS_VERIFY} -ge 15 ]]; then
     # Check if the password has at least 2 upper case letters
@@ -116,7 +118,7 @@ fi
 # Check passwords to see if they are the same.
 dod_pass_compare()
 {
-if [ "USER_PASS" == "USER_PASS_VERIFY" ]; then 
+if [ "$USER_PASS" == "$USER_PASS_VERIFY" ]; then 
     user_add_sguild
 else 
     echo ""
@@ -142,4 +144,4 @@ fi
 #  Magic happens below  #
 #########################
 dod_user_name
-dod_user_pass
+
