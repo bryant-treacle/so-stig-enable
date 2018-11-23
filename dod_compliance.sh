@@ -23,9 +23,9 @@ welcome_script()
 cat << EOF 
 
 This script will make the following changes to Security Onion 16.04 in order to meet DoD RMF Requirements:
-    - Add DoD login banner
+    - Add DoD login banner (for SSH and Desktop enviroment logins)
     - Lock account after 3 failed login attempts
-    - Enforce DoD password complexity (Server and Applications)
+    - Enforce DoD password complexity (Local accounts and sguil/kibana)
 
 EOF
 }
@@ -47,11 +47,11 @@ sudo systemctl restart sshd
 # This will add a DoD consent splash page for web access
 # This only works because Apache2 will load index.html before index.php.  This can be modified in the
 # /etc/apache2/mods-enabled/dir.conf
-sudo cp index.html /var/www/so/
+sudo cp dod_index.html /var/www/so/index.html
 sudo cp dod_banner.css /var/www/so/css
 
 # DoD consent Splash Page for gnome login.
-sudo cp 50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
+sudo cp dod_50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
 }
 
 ########################
@@ -61,7 +61,7 @@ login_account_lock()
 {
 echo ""
 echo "Setting server accouts to lock for 60 Minutes after 3 failed login attempts."
-sudo cp common-auth /etc/pam.d/common-auth
+sudo cp dod_common-auth /etc/pam.d/common-auth
 }
 
 #############################
@@ -71,7 +71,7 @@ password_complexity()
 {
 echo ""
 echo "Configuring password Complexity to DoD standard"
-sudo cp common-password /etc/pam.d/common-password
+sudo cp dod_common-password /etc/pam.d/common-password
 sudo dpkg -i libpam-cracklib_1.1.8-3.2ubuntu2_amd64.deb
 echo ""
 echo "Moving old so-user-add script to /usr/sbin/.so-user-add.bak"
