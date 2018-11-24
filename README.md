@@ -30,7 +30,7 @@ This script will add additional the below controls to Security Onion 16.04.x in 
 
     - dod_common-auth - Added line to enforce 60 min account lockout after 3 failed login attempts.  
 
-    - dod_common-password - Added Line to enforce Min length, number of upper,lower,digits, and special characters.
+    - dod_common-password - Added Line to enforce Min length, number of upper,lower,digits, and special characters.  Add number of rounds for encryption to 5000.
 
     - dod_login_banner - Text file that will be displayed on any SSH login.  Uses Message of The Day (MOTD) feature in linux, and the filename/location is defined in /etc/ssh/sshd_config.
 
