@@ -64,6 +64,15 @@ echo "Setting server accouts to lock for 60 Minutes after 3 failed login attempt
 sudo cp dod_common-auth /etc/pam.d/common-auth
 }
 
+###############################
+#  Account inactivity logout  #
+###############################
+# Add inactivity logout IAW V-75441
+inactivity_logout()
+{
+sudo printf '#!/bin/bash\nTMOUT=900\nreadonly TMOUT\nexport TMOUT' > /etc/profile.d/autologout.sh
+sudo chmod 755 /etc/profile.d/autologout.sh
+}
 #############################
 #  Set Password Complexity  #
 #############################
@@ -88,4 +97,5 @@ sudo chmod 755 /usr/sbin/so-user-add
 welcome_script
 login_banner
 login_account_lock
+inactivity_logout
 password_complexity
