@@ -71,6 +71,14 @@ max_login_limit()
 {
 echo '* hard maxlogins 10' >> /etc/security/limits.conf
 }
+####################################
+#  Password lifetime restrictions  #
+####################################
+pass_lifetime()
+{
+# STIG Vul ID: V-75471
+sed -i 's|PASS_MIN_DAYS.*|PASS_MIN_DAYS   1|g' /etc/login.defs
+sed -i 's|PASS_MAX_DAYS.*|PASS_MAX_DAYS   60|g' /etc/login.defs
 ###############################
 #  Account inactivity logout  #
 ###############################
