@@ -79,6 +79,16 @@ pass_lifetime()
 # STIG Vul ID: V-75471
 sed -i 's|PASS_MIN_DAYS.*|PASS_MIN_DAYS   1|g' /etc/login.defs
 sed -i 's|PASS_MAX_DAYS.*|PASS_MAX_DAYS   60|g' /etc/login.defs
+}
+################################
+#  Account Inactivity disable  #
+################################
+inactive_accounts()
+{
+# STIG Vul ID: V-75485
+useradd -D -f 35
+}
+
 ###############################
 #  Account inactivity logout  #
 ###############################
