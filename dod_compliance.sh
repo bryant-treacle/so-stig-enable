@@ -65,6 +65,7 @@ sudo cp dod_common-auth /etc/pam.d/common-auth
 }
 #####################
 #  Max Login limit  #
+#  Vul ID: V-75443  #
 #####################
 max_login_limit()
 {
