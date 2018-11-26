@@ -63,7 +63,13 @@ echo ""
 echo "Setting server accouts to lock for 60 Minutes after 3 failed login attempts."
 sudo cp dod_common-auth /etc/pam.d/common-auth
 }
-
+#####################
+#  Max Login limit  #
+#####################
+max_login_limit()
+{
+echo '* hard maxlogins 10' >> /etc/security/limits.conf
+}
 ###############################
 #  Account inactivity logout  #
 ###############################
@@ -97,5 +103,6 @@ sudo chmod 755 /usr/sbin/so-user-add
 welcome_script
 login_banner
 login_account_lock
+max_login_limit
 inactivity_logout
 password_complexity
