@@ -137,6 +137,35 @@ printf '# DoD Stig Vul ID: V-80957\n[org/gnome/settings-daemon/plugins/media-key
 dconf update
 }
 
+########################################
+#  USB Mounting disabled               #
+#  Severity: CAT II | Vul ID: V-75531  #
+########################################
+usb_mount_disable()
+{
+echo "install usb-storage /bin/true" >> /etc/modprobe.d/dod_stig.conf
+}
+
+########################################
+#  /var/lib/docker group owner         #
+#  Severity: CAT II | Vul ID: V-75557  #
+########################################
+docker_group_owner()
+{
+chwon -R root:root /var/lib/docker/
+}
+
+########################################
+#  login_defs_create_home              #
+#  Severity: CAT II | Vul ID: V-75561  #
+########################################
+login_defs_create_home()
+{
+echo "CREATE_HOME yes" >> /etc/login.defs
+}
+
+############################
+#################################
 #  Where the Magic Happens !!!  #
 #################################
 welcome_script
