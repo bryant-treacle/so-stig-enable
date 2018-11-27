@@ -116,7 +116,27 @@ sudo cp dod_sguil_password.sh /usr/sbin/so-user-add
 sudo chmod 755 /usr/sbin/so-user-add
 }
 
-#################################
+#####################################
+#    PermitUserEnv. in sshd.conf    #
+# Severity: CAT I| Vul ID: V-75833  #
+#####################################
+sshd_user_env()
+{
+printf '# DoD Stig Vul ID: V-75833\nPermitUserEnvironment no' >> /etc/ssh/sshd_config
+sudo systemctl restart sshd.service
+}
+
+#######################################
+#      Ctrl-Alt-Del seq disable       #  
+#  Severity: CAT I | Vul ID: V-80957  #
+#######################################
+crtl_alt_del()
+{
+mkdir /etc/dconf/db/local.d/
+printf '# DoD Stig Vul ID: V-80957\n[org/gnome/settings-daemon/plugins/media-keys]\nlogout="" ' > /etc/dconf/db/local.d/00-disable-CAD
+dconf update
+}
+
 #  Where the Magic Happens !!!  #
 #################################
 welcome_script
