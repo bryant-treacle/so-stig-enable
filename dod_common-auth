@@ -18,10 +18,12 @@ auth    [success=1 default=ignore]      pam_unix.so
 # here's the fallback if no module succeeds
 auth    required                        pam_deny.so
 # Lock User Accounts After Consecutive Failed Authentications
-auth    required    pam_tally2.so    onerr=fail deny=3 unlock_time=3600
+auth    required                        pam_tally2.so    onerr=fail deny=3 unlock_time=3600
 # prime the stack with a positive return value if there isn't one already;
 # this avoids us returning an error just because nothing sets a success code
 # since the modules above will each just jump around
 auth    required                        pam_permit.so
+# DoD STIG Severity: CAT II | Vul ID: V-75493 enforce a delay of at least 4 seconds between logon prompts
+auth    required                        pam_faildelay.so    delay=400000
 # end of pam-auth-update config
 
