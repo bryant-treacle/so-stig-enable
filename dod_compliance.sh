@@ -41,6 +41,7 @@ echo "Adding DoD login Message Banner"
 sudo cp dod_login_banner /etc/dod_login_banner
 
 # Add banner file location to sshd_config
+# Vul ID: V-75825 | Severity: CAT II
 sudo sed -i 's|#Banner /etc/issue.net|Banner /etc/dod_login_banner|g' /etc/ssh/sshd_config
 sudo systemctl restart sshd
 
