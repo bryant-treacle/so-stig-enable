@@ -178,6 +178,17 @@ echo "maxpoll = 17" >> /etc/ntp.conf
 systemclt restart ntp
 }
 
+#######################################
+#        TCP syncookies               #
+# Severity: CAT II | Vul ID: V-75869  #
+#######################################
+sysctl_conf()
+{
+sed -i 's|#net.ipv4.tcp_syncookies = 1|net.ipv4.tcp_syncookies = 1|g' /etc/sysctl.conf
+# Force sysctl changes without reboot
+sysctl -p 
+}
+
 #################################
 #  Where the Magic Happens !!!  #
 #################################
