@@ -180,12 +180,17 @@ systemclt restart ntp
 
 #######################################
 #        TCP syncookies               #
-# Severity: CAT II | Vul ID: V-75869  #
+#       Severity: CAT II              #
+# Vul ID: V-75869, V-75883, V-75885,	  #
+# V-75887, 
 #######################################
 sysctl_conf()
 {
 sed -i 's|#net.ipv4.tcp_syncookies = 1|net.ipv4.tcp_syncookies = 1|g' /etc/sysctl.conf
 sed -i 's|#net.ipv4.conf.default.accept_redirects = 0|net.ipv4.conf.default.accept_redirects = 0|g' /etc/sysctl.conf
+sed -i 's|#net.ipv4.conf.all.send_redirects = 0|net.ipv4.conf.all.send_redirects = 0|g' /etc/sysctl.conf
+sed -i 's|#net.ipv4.ip_forward=1|net.ipv4.ip_forward = 0|g' /etc/sysctl.conf
+printf '\n#DoD STIG Vul ID: V-75883\nnet.ipv4.conf.default.send_redirects=0' >> /etc/sysctl.conf
 # Force sysctl changes without reboot
 sysctl -p 
 }
