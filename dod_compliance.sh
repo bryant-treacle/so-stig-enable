@@ -164,7 +164,17 @@ login_defs_create_home()
 echo "CREATE_HOME yes" >> /etc/login.defs
 }
 
-############################
+#######################################
+#             NTP maxpoll             #
+# Severity: CAT II | Vul ID: V-75813  #
+#######################################
+ntp_maxpoll()
+{
+echo "maxpoll = 17" >> /etc/ntp.conf
+systemclt restart ntp
+}
+
+
 #################################
 #  Where the Magic Happens !!!  #
 #################################
