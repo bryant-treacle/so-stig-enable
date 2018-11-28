@@ -119,11 +119,12 @@ sudo chmod 755 /usr/sbin/so-user-add
 
 #####################################
 #    PermitUserEnv. in sshd.conf    #
-# Severity: CAT I| Vul ID: V-75833  #
+#    Severity: CAT I/CAT II         #
+# Vul ID: V-75833,V-75829,V-75831   #
 #####################################
-sshd_user_env()
+sshd_conf()
 {
-printf '# DoD Stig Vul ID: V-75833\nPermitUserEnvironment no' >> /etc/ssh/sshd_config
+printf '# DoD Stig Vul ID: V-75833\nPermitUserEnvironment no\n\n#DoD STIG Vul ID: V-75829\nCiphers aes128-ctr,aes192-ctr,aes256-ctr\n\n#DoD STIG Vul ID: V-75831\nMACs hmac-sha2-256,hmac-sha2-512' >> /etc/ssh/sshd_config
 sudo systemctl restart sshd.service
 }
 
@@ -174,7 +175,6 @@ ntp_maxpoll()
 echo "maxpoll = 17" >> /etc/ntp.conf
 systemclt restart ntp
 }
-
 
 #################################
 #  Where the Magic Happens !!!  #
