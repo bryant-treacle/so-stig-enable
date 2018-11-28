@@ -42,17 +42,17 @@ sudo cp dod_login_banner /etc/dod_login_banner
 
 # Add banner file location to sshd_config
 # Vul ID: V-75825 | Severity: CAT II
-sudo sed -i 's|#Banner /etc/issue.net|Banner /etc/dod_login_banner|g' /etc/ssh/sshd_config
-sudo systemctl restart sshd
+sed -i 's|#Banner /etc/issue.net|Banner /etc/dod_login_banner|g' /etc/ssh/sshd_config
+systemctl restart sshd
 
 # This will add a DoD consent splash page for web access
 # This only works because Apache2 will load index.html before index.php.  This can be modified in the
 # /etc/apache2/mods-enabled/dir.conf
-sudo cp dod_index.html /var/www/so/index.html
-sudo cp dod_banner.css /var/www/so/css
+cp dod_index.html /var/www/so/index.html
+cp dod_banner.css /var/www/so/css
 
 # DoD consent Splash Page for gnome login.
-sudo cp dod_50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
+cp dod_50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
 }
 
 ########################
@@ -120,11 +120,13 @@ sudo chmod 755 /usr/sbin/so-user-add
 #####################################
 #    PermitUserEnv. in sshd.conf    #
 #    Severity: CAT I/CAT II         #
-# Vul ID: V-75833,V-75829,V-75831   #
+# Vul ID: V-75833,V-75829,V-75831,  #
+# V-75841	                        #
 #####################################
 sshd_conf()
 {
 printf '# DoD Stig Vul ID: V-75833\nPermitUserEnvironment no\n\n#DoD STIG Vul ID: V-75829\nCiphers aes128-ctr,aes192-ctr,aes256-ctr\n\n#DoD STIG Vul ID: V-75831\nMACs hmac-sha2-256,hmac-sha2-512' >> /etc/ssh/sshd_config
+sed -i 's|#IgnoreUserKnownHosts yes|IgnoreUserKnownHosts yes|g' /etc/ssh/sshd_config
 sudo systemctl restart sshd.service
 }
 
