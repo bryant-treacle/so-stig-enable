@@ -194,13 +194,20 @@ sysctl -p
 
 ########################################
 #              auditd                  #
-#  Vul ID: V-75617                     #
+#  Vul ID: V-75617,75627, 75629,        #
 ########################################
 auditd()
 {
 # Installing auditd deb packages + dependences
 dpkg -i deb_packages/libauparse0_2.4.5-1ubuntu2.1_amd64.deb
 dpkg -i deb_packages/auditd_2.4.5-1ubuntu2_amd64.deb
+dpkg -i deb_packages/libprelude2v5_1.0.0-11.7ubuntu1_amd64.deb
+dpkg -i deb_packages/audispd-plugins_2.4.5-1ubuntu2_amd64.deb
+#Set Max_log_file_action from Rotate to Syslog
+sed -i 's|max_log_file_action = ROTATE|max_log_file_action = SYSLOG|g' /etc/audit/auditd.conf
+sed -i 's|disk_full_action = SUSPEND|disk_full_action = HALT|g' /etc/audit/auditd.conf
+
+
 }
 
 #################################
