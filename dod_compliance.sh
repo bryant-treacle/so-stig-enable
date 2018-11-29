@@ -63,6 +63,8 @@ cp dod_50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
 common_auth()
 {
 sudo cp dod_common-auth /etc/pam.d/common-auth
+# Force pam modules to take updates without reboot
+pam-auth-update --force
 }
 #####################
 #  Max Login limit  #
@@ -155,7 +157,7 @@ echo "install usb-storage /bin/true" >> /etc/modprobe.d/dod_stig.conf
 ########################################
 docker_group_owner()
 {
-chwon -R root:root /var/lib/docker/
+chown -R root:root /var/lib/docker/
 }
 
 #######################################
@@ -165,7 +167,7 @@ chwon -R root:root /var/lib/docker/
 ntp_maxpoll()
 {
 echo "maxpoll = 17" >> /etc/ntp.conf
-systemclt restart ntp
+systemctl restart ntp
 }
 
 #######################################
