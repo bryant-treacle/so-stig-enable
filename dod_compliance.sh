@@ -12,6 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Author: Bryant Treacle
+#
+# Date Created: 27 Nov 18
+#
+# Last Modified: 29 Nov 18
 
 
 
