@@ -152,7 +152,7 @@ dconf update
 #  USB Mounting disabled               #
 #  Severity: CAT II | Vul ID: V-75531  #
 ########################################
-usb_mount_disable()
+usb_mount_disable()d
 {
 echo "install usb-storage /bin/true" >> /etc/modprobe.d/dod_stig.conf
 }
@@ -205,6 +205,6 @@ password_complexity
 sshd_conf
 crtl_alt_del
 usb_mount_disable
-docker_group_owner
+#docker_group_owner (getting hung up.  Not sure if docker containers need to be stoped)
 ntp_maxpoll
 sysctl_conf
