@@ -215,6 +215,7 @@ printf "#DoD STIG Vul ID: V-75663\n-w /etc/group -p wa -k identity" >>/etc/audit
 printf "#DoD STIG Vul ID: V-75665\n-w /etc/gshadow -p wa -k identity" >>/etc/audit/audit.rules
 printf "#DoD STIG Vul ID: V-75667\n-w /etc/shadow -p wa -k identity" >>/etc/audit/audit.rules
 printf "#DoD STIG Vul ID: V-75687\n-w /etc/security/opasswd -p wa -k identity" >>/etc/audit/audit.rules
+
 systemctl restart auditd.service
 }
 
