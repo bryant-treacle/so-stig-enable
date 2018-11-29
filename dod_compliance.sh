@@ -31,7 +31,8 @@ EOF
 }
 
 #######################
-#  DoD login Banner  #
+#  DoD login Banners 
+#  STIG Vul ID's: V-75393, 75435 
 #######################
 login_banner()
 {
@@ -56,12 +57,11 @@ cp dod_50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
 }
 
 ########################
-#  login account lock  #
+#  Local Login Controls  #
+#  STIG Vul ID: V-75479, 75487, 75493
 ########################
-login_account_lock()
+common_auth()
 {
-echo ""
-echo "Setting server accouts to lock for 60 Minutes after 3 failed login attempts."
 sudo cp dod_common-auth /etc/pam.d/common-auth
 }
 #####################
@@ -74,52 +74,51 @@ echo '* hard maxlogins 10' >> /etc/security/limits.conf
 }
 ####################################
 #  Password lifetime restrictions  #
+#  STIG Vul ID's: V-75471, 75473, V-75561   #
 ####################################
-pass_lifetime()
+login.defs()
 {
-# STIG Vul ID: V-75471
 sed -i 's|PASS_MIN_DAYS.*|PASS_MIN_DAYS   1|g' /etc/login.defs
 sed -i 's|PASS_MAX_DAYS.*|PASS_MAX_DAYS   60|g' /etc/login.defs
+echo "CREATE_HOME yes" >> /etc/login.defs
 }
 ################################
-#  Account Inactivity disable  #
+#  Account Inactivity disable
+#  STIG Vul ID: V-75485
 ################################
 inactive_accounts()
 {
-# STIG Vul ID: V-75485
 useradd -D -f 35
 }
 
 ###############################
-#  Account inactivity logout  #
+#  Account inactivity logout
+# STIG Vul ID: V-75441
 ###############################
-# Add inactivity logout IAW V-75441
 inactivity_logout()
 {
 sudo printf '#!/bin/bash\nTMOUT=900\nreadonly TMOUT\nexport TMOUT' > /etc/profile.d/autologout.sh
 sudo chmod 755 /etc/profile.d/autologout.sh
 }
-#############################
-#  Set Password Complexity  #
-#############################
+#################################################
+#  Set Password Complexity                      #
+#  STIG Vul ID's: V-75449, 75451, 75453,75455,  #
+#  75457, 75475, 75477                          #
+#################################################
 password_complexity()
 {
-echo ""
-echo "Configuring password Complexity to DoD standard"
 sudo cp dod_common-password /etc/pam.d/common-password
 sudo dpkg -i libpam-cracklib_1.1.8-3.2ubuntu2_amd64.deb
-echo ""
-echo "Moving old so-user-add script to /usr/sbin/.so-user-add.bak"
+#Backing up old so-user-add script
 sudo mv /usr/sbin/so-user-add /usr/sbin/.so-user-add.bak
-echo ""
-echo "Adding new so-user-add script"
 sudo cp dod_sguil_password.sh /usr/sbin/so-user-add
 sudo chmod 755 /usr/sbin/so-user-add
+# Adding dictionary password check requirement
+echo "dictcheck=1" >> /etc/security/pwquality.conf
 }
 
 #####################################
 #    PermitUserEnv. in sshd.conf    #
-#    Severity: CAT I/CAT II         #
 # Vul ID: V-75833,V-75829,V-75831,  #
 # V-75841	                        #
 #####################################
@@ -159,15 +158,6 @@ docker_group_owner()
 chwon -R root:root /var/lib/docker/
 }
 
-########################################
-#  login_defs_create_home              #
-#  Severity: CAT II | Vul ID: V-75561  #
-########################################
-login_defs_create_home()
-{
-echo "CREATE_HOME yes" >> /etc/login.defs
-}
-
 #######################################
 #             NTP maxpoll             #
 # Severity: CAT II | Vul ID: V-75813  #
@@ -180,9 +170,8 @@ systemclt restart ntp
 
 #######################################
 #        TCP syncookies               #
-#       Severity: CAT II              #
-# Vul ID: V-75869, V-75883, V-75885,	  #
-# V-75887, 
+# Vul ID: V-75869, V-75883, V-75885,  #
+# V-75887,                            #
 #######################################
 sysctl_conf()
 {
@@ -200,7 +189,14 @@ sysctl -p
 #################################
 welcome_script
 login_banner
-login_account_lock
-max_login_limit
+common_auth
+login.defs
+inactive_accounts
 inactivity_logout
 password_complexity
+sshd_conf
+crtl_alt_del
+usb_mount_disable
+docker_group_owner
+ntp_maxpoll
+sysctl_conf
