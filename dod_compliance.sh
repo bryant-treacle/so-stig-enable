@@ -116,7 +116,7 @@ sudo chmod 755 /etc/profile.d/autologout.sh
 password_complexity()
 {
 sudo cp dod_common-password /etc/pam.d/common-password
-sudo dpkg -i libpam-cracklib_1.1.8-3.2ubuntu2_amd64.deb
+sudo dpkg -i /deb_packages/libpam-cracklib_1.1.8-3.2ubuntu2_amd64.deb
 #Backing up old so-user-add script
 sudo mv /usr/sbin/so-user-add /usr/sbin/.so-user-add.bak
 sudo cp dod_sguil_password.sh /usr/sbin/so-user-add
@@ -192,6 +192,17 @@ printf '\n#DoD STIG Vul ID: V-75883\nnet.ipv4.conf.default.send_redirects=0' >> 
 sysctl -p 
 }
 
+########################################
+#              auditd                  #
+#  Vul ID: V-75617                     #
+########################################
+auditd()
+{
+# Installing auditd deb packages + dependences
+dpkg -i /deb_packages/libauparse0_2.4.5-1ubuntu2.1_amd64.deb
+dpkg -i /deb_packages/auditd_2.4.5-1ubuntu2_amd64.deb
+}
+
 #################################
 #  Where the Magic Happens !!!  #
 #################################
@@ -208,3 +219,4 @@ usb_mount_disable
 #docker_group_owner (getting hung up.  Not sure if docker containers need to be stoped)
 ntp_maxpoll
 sysctl_conf
+auditd
