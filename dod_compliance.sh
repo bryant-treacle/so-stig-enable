@@ -194,7 +194,8 @@ sysctl -p
 
 ########################################
 #              auditd                  #
-#  Vul ID: V-75617,75627, 75629,        #
+#  Vul ID: V-75617,75627, 75629, 75661 #
+#  75663, 75665, 75667, 75687
 ########################################
 auditd()
 {
@@ -206,8 +207,15 @@ dpkg -i deb_packages/audispd-plugins_2.4.5-1ubuntu2_amd64.deb
 #Set Max_log_file_action from Rotate to Syslog
 sed -i 's|max_log_file_action = ROTATE|max_log_file_action = SYSLOG|g' /etc/audit/auditd.conf
 sed -i 's|disk_full_action = SUSPEND|disk_full_action = HALT|g' /etc/audit/auditd.conf
-
-
+sed -i 's|disk_full_action = ignore|disk_full_action = SYSLOG|g' /etc/audisp/audisp-remote.conf
+sed -i 's|##enable_krb5 = no|enable_krb5 = yes|g' /etc/audisp/audisp-remote.conf
+# Add rule to audit creations, modifications, disabling, and termination events that affect "/etc/passwd"
+printf "#DoD STIG Vul ID: V-75661\n-w /etc/passwd -p wa -k identity" >>/etc/audit/audit.rules
+printf "#DoD STIG Vul ID: V-75663\n-w /etc/group -p wa -k identity" >>/etc/audit/audit.rules
+printf "#DoD STIG Vul ID: V-75665\n-w /etc/gshadow -p wa -k identity" >>/etc/audit/audit.rules
+printf "#DoD STIG Vul ID: V-75667\n-w /etc/shadow -p wa -k identity" >>/etc/audit/audit.rules
+printf "#DoD STIG Vul ID: V-75687\n-w /etc/security/opasswd -p wa -k identity" >>/etc/audit/audit.rules
+systemctl restart auditd.service
 }
 
 #################################
