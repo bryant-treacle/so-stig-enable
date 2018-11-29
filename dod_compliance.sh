@@ -152,7 +152,7 @@ dconf update
 #  USB Mounting disabled               #
 #  Severity: CAT II | Vul ID: V-75531  #
 ########################################
-usb_mount_disable()d
+usb_mount_disable()
 {
 echo "install usb-storage /bin/true" >> /etc/modprobe.d/dod_stig.conf
 }
