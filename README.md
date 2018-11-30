@@ -9,16 +9,6 @@ This script will add additional the below controls to Security Onion 16.04.x in 
 ## Password Compliance:
     - Enforces DoD Password Policies on any local server account created after the script.
     - Adds Compliance to the following STIG Finding IDs using the Application Security and Development Security Technical Implementation Guide.
-        - V-69343 - The application must enforce the limit of three consecutive invalid logon attempts
-        - V-69555 - The application must enforce a minimum 15-character password length.
-        - V-69575 - The application must prohibit password reuse for a minimum of five generations.
-        - V-69573 - The application must enforce a 60-day maximum password lifetime restriction.
-        - V-69561 - The application must enforce password complexity by requiring that at least one numeric character be used.
-        - V-69557 - The application must enforce password complexity by requiring that at least one upper-case character be used.
-        - V-69559 - The application must enforce password complexity by requiring that at least one lower-case character be used.
-        - V-69563 - The application must enforce password complexity by requiring that at least one special character be used.
-        - V-69349 - The application must display the Standard Mandatory DoD Notice and Consent Banner before granting access to the application.
-        - V-69351 - The application must retain the Standard Mandatory DoD Notice and Consent Banner on the screen until users acknowledge the usage conditions and take explicit actions to log on for further access.
 
 
 
