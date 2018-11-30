@@ -1,0 +1,208 @@
+# DoD STIG Vul ID: V-75661
+-w /etc/passwd -p wa -k
+
+# DoD STIG Vul ID: V-75663
+-w /etc/group -p wa -k 
+
+# DoD STIG Vul ID: V-75665
+-w /etc/gshadow -p wa -k 
+
+# DoD STIG Vul ID: V-75667
+-w /etc/shadow -p wa -k 
+
+# DoD STIG Vul ID: V-75687
+-w /etc/security/opasswd -p wa -k identity
+
+# DoD STIG Vul ID: V-75689
+-a always,exit -F arch=b64 -S execve -C uid!=euid -F key=execpriv 
+-a always,exit -F arch=b64 -S execve -C gid!=egid -F key=execpriv 
+
+# DoD STIG Vul ID: V-75691
+-a always,exit -F path=/bin/su -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change 
+
+# DoD STIG Vul ID: V-75691
+-a always,exit -F path=/bin/su -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-priv_change 
+
+# DoD STIG Vul ID: V-75697
+-a always,exit -F path=/bin/umount -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-mount
+
+# DoD STIG Vul ID: V-75699
+-a always,exit -F path=/usr/bin/ssh-agent -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-ssh
+
+# DoD STIG Vul ID: V-75707
+-a always,exit -F path=/usr/lib/openssh/ssh-keysign -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-ssh
+
+# DoD STIG Vul ID: V-75709
+-w /sbin/insmod -p x -k modules
+
+# DoD STIG Vul ID: V-75711
+-w /sbin/rmmod -p x -k modules
+
+# DoD STIG Vul ID: V-75713
+-w /sbin/modprobe -p x -k modules
+
+# DoD STIG Vul ID: V-75715
+-w /bin/kmod -p x -k modules
+
+# DoD STIG Vul ID: V-75717
+-a always,exit -F arch=b64 -S setxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S setxattr -F auid=0 -k perm_mod 
+
+# DoD STIG Vul ID: V-75719
+-a always,exit -F arch=b64 -S lsetxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S lsetxattr -F auid=0 -k perm_mod 
+
+# DoD STIG Vul ID: V-75721
+-a always,exit -F arch=b64 -S fsetxattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S fsetxattr -F auid=0 -k perm_mod
+
+# DoD STIG Vul ID: V-75723
+-a always,exit -F arch=b64 -S removexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S removexattr -F auid=0 -k perm_mod 
+
+# DoD STIG Vul ID: V-75725
+-a always,exit -F arch=b64 -S lremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S lremovexattr -F auid=0 -k perm_mod
+
+# DoD STIG Vul ID: V-75727
+-a always,exit -F arch=b64 -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod
+-a always,exit -F arch=b64 -S fremovexattr -F auid=0 -k perm_mod
+
+# DoD STIG Vul ID: V-75729
+-a always,exit -F arch=b64 -S chown -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+# DoD STIG Vul ID: V-75731
+-a always,exit -F arch=b64 -S fchown -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+# DoD STIG Vul ID: V-75733
+-a always,exit -F arch=b64 -S fchownat -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+# DoD STIG Vul ID: V-75735
+-a always,exit -F arch=b64 -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+#DoD STIG Vul ID: V-75737
+-a always,exit -F arch=b64 -S chmod -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+# DoD STIG Vul ID: V-75739
+-a always,exit -F arch=b64 -S fchmod -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+# DoD STIG Vul ID: V-75741
+-a always,exit -F arch=b64 -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+# DoD STIG Vul ID: V-75743
+-a always,exit -F arch=b64 -S open -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k perm_access
+-a always,exit -F arch=b64 -S open -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k perm_access
+
+# DoD STIG Vul ID: V-75745
+-a always,exit -F arch=b64 -S truncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k perm_access
+-a always,exit -F arch=b64 -S truncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k perm_access
+
+# DoD STIG Vul ID: V-75747
+-a always,exit -F arch=b64 -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k perm_access
+-a always,exit -F arch=b64 -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k perm_access
+
+# DoD STIG Vul ID: V-75749
+-a always,exit -F arch=b64 -S creat -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k perm_access
+-a always,exit -F arch=b64 -S creat -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k perm_access
+
+# DoD STIG Vul ID: V-75751
+-a always,exit -F arch=b64 -S openat -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k perm_access
+-a always,exit -F arch=b64 -S openat -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k perm_access
+
+# DoD STIG Vul ID: V-75753
+-a always,exit -F arch=b64 -S open_by_handle_at -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k perm_access
+-a always,exit -F arch=b64 -S open_by_handle_at -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k perm_access
+
+# DoD STIG Vul ID: V-75755
+-a always,exit -F path=/usr/bin/sudo -F perm=x -F auid>=1000 -F auid!=4294967295 -k priv_cmd
+
+# DoD STIG Vul ID: V-75757
+-a always,exit -F path=/usr/bin/sudoedit -F perm=x -F auid>=1000 -F auid!=4294967295 -k priv_cmd
+
+# DoD STIG Vul ID: V-75759
+-a always,exit -F path=/usr/bin/chsh -F perm=x -F auid>=1000 -F auid!=4294967295 -k priv_cmd
+
+# DoD STIG Vul ID: V-75761
+-a always,exit -F path=/usr/bin/newgrp -F perm=x -F auid>=1000 -F auid!=4294967295 -k priv_cmd
+
+# DoD STIG Vul ID: V-75765
+-a always,exit -F path=/sbin/apparmor_parser -F perm=x -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+# DoD STIG Vul ID: V-75767
+-a always,exit -F path=/usr/bin/setfacl -F perm=x -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+# DoD STIG Vul ID: V-75769
+-a always,exit -F path=/usr/bin/chacl -F perm=x -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+# DoD STIG Vul ID: V-75771
+-w /var/log/tallylog -p wa -k logins
+
+# DoD STIG Vul ID: V-75773
+-w /var/log/faillog -p wa -k logins
+
+# DoD STIG Vul ID: V-75775
+-w /var/log/lastlog -p wa -k logins
+
+# DoD STIG Vul ID: V-75777
+-a always,exit -F path=/usr/bin/passwd -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-passwd
+
+# DoD STIG Vul ID: V-75779
+-a always,exit -F path=/sbin/unix_update -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-unix-update
+
+# DoD STIG Vul ID: V-75781
+-a always,exit -F path=/usr/bin/gpasswd -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-gpasswd
+
+# DoD STIG Vul ID: V-75783
+-a always,exit -F path=/usr/bin/chage -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-chage
+
+# DoD STIG Vul ID: V-75785
+-a always,exit -F path=/usr/sbin/usermod -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-usermod
+
+# DoD STIG Vul ID: V-75787
+-a always,exit -F path=/usr/bin/crontab -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-crontab
+
+# DoD STIG Vul ID: V-75789
+-a always,exit -F path=/usr/sbin/pam_timestamp_check -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-pam_timestamp_check
+
+# DoD STIG Vul ID: V-75791
+-a always,exit -F arch=b64 -S init_module -F auid>=1000 -F auid!=4294967295 -k module_chng
+
+# DoD STIG Vul ID: V-75793
+-a always,exit -F arch=b64 -S finit_module -F auid>=1000 -F auid!=4294967295 -k module_chng
+
+# DoD STIG Vul ID: V-75795
+-a always,exit -F arch=b64 -S delete_module -F auid>=1000 -F auid!=4294967295 -k module_chng
+
+# DoD STIG Vul ID: V-80969
+-a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>=1000 -F auid!=4294967295 -k perm_chng
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
