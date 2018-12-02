@@ -214,6 +214,16 @@ cp audit.rules /etc/audit/audit.rules
 systemctl restart auditd.service
 }
 
+##########################################
+#               PKI Packages             #
+# Vul ID: V-75903, 75905
+##########################################
+pki_packages()
+{
+dpkg -i deb_packages/opensc-pkcs11_0.15.0-1ubuntu1_amd64.deb
+dpkg -i deb_packages/libpam-pkcs11_0.6.8-4_amd64.deb
+}
+
 #################################
 #  Where the Magic Happens !!!  #
 #################################
@@ -231,3 +241,4 @@ usb_mount_disable
 ntp_maxpoll
 sysctl_conf
 auditd
+pki_packages
