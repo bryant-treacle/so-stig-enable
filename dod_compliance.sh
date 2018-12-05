@@ -237,6 +237,15 @@ sudoers_config()
 sed -i 's|NOPASSWD|PASSWD|g' /etc/sudoers.d/securityonion-onionsalt
 }
 
+###################################
+#  Vlock Virtual Console locking  #
+#  Vul ID: V-75439                #
+###################################
+vlock_config()
+{
+dpkg -i deb_packages/vlock_2.2.2-5_amd64.deb
+}
+
 #################################
 #  Where the Magic Happens !!!  #
 #################################
