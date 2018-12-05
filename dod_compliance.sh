@@ -128,12 +128,13 @@ echo "dictcheck=1" >> /etc/security/pwquality.conf
 #####################################
 #    PermitUserEnv. in sshd.conf    #
 # Vul ID: V-75833,V-75829,V-75831,  #
-# V-75841	                        #
+# V-75841, 75827, 75851             #
 #####################################
 sshd_conf()
 {
 printf '# DoD Stig Vul ID: V-75833\nPermitUserEnvironment no\n\n#DoD STIG Vul ID: V-75829\nCiphers aes128-ctr,aes192-ctr,aes256-ctr\n\n#DoD STIG Vul ID: V-75831\nMACs hmac-sha2-256,hmac-sha2-512\n\n#DoD STIG Vul ID: V-75851\nCompression no' >> /etc/ssh/sshd_config
 sed -i 's|#IgnoreUserKnownHosts yes|IgnoreUserKnownHosts yes|g' /etc/ssh/sshd_config
+sed -i 's|PermitRootLogin prohibit-password|PermitRootLogin no|g' /etc/ssh/sshd_config
 sudo systemctl restart sshd.service
 }
 
@@ -147,7 +148,7 @@ mkdir /etc/dconf/db/local.d/
 printf '# DoD Stig Vul ID: V-80957\n[org/gnome/settings-daemon/plugins/media-keys]\nlogout="" ' > /etc/dconf/db/local.d/00-disable-CAD
 dconf update
 }
-
+q
 ########################################
 #  USB Mounting disabled               #
 #  Severity: CAT II | Vul ID: V-75531  #
