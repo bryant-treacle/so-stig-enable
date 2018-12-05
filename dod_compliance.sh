@@ -210,6 +210,7 @@ sed -i 's|max_log_file_action = ROTATE|max_log_file_action = SYSLOG|g' /etc/audi
 sed -i 's|disk_full_action = SUSPEND|disk_full_action = HALT|g' /etc/audit/auditd.conf
 sed -i 's|disk_full_action = ignore|disk_full_action = SYSLOG|g' /etc/audisp/audisp-remote.conf
 sed -i 's|##enable_krb5 = no|enable_krb5 = yes|g' /etc/audisp/audisp-remote.conf
+sed -i 's|network_failure_action = stop|network_failure_action = halt|g' /etc/audisp/audisp-remote.conf
 # All required audit rules have been consolidated in the audit.rules files
 cp audit.rules /etc/audit/audit.rules
 systemctl restart auditd.service
