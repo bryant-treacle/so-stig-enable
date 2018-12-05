@@ -89,6 +89,7 @@ login.defs()
 sed -i 's|PASS_MIN_DAYS.*|PASS_MIN_DAYS   1|g' /etc/login.defs
 sed -i 's|PASS_MAX_DAYS.*|PASS_MAX_DAYS   60|g' /etc/login.defs
 echo "CREATE_HOME yes" >> /etc/login.defs
+sed -i 's|UMASK.*|UMASK 077|g' /etc/login.defs
 }
 ################################
 #  Account Inactivity disable
@@ -224,6 +225,15 @@ pki_packages()
 {
 dpkg -i deb_packages/opensc-pkcs11_0.15.0-1ubuntu1_amd64.deb
 dpkg -i deb_packages/libpam-pkcs11_0.6.8-4_amd64.deb
+}
+
+############################################
+#  /etc/sudoers.d/securityonion-onionsalt  #
+#  Vul ID: V-75489	                       #
+############################################
+sudoers_config()
+{
+sed -i 's|NOPASSWD|PASSWD|g' /etc/sudoers.d/securityonion-onionsalt
 }
 
 #################################
