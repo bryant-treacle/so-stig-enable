@@ -81,8 +81,9 @@ max_login_limit()
 echo '* hard maxlogins 10' >> /etc/security/limits.conf
 }
 ####################################
-#  Password lifetime restrictions  #
-#  STIG Vul ID's: V-75471, 75473, V-75561   #
+#           login defs             #
+#  STIG Vul ID's: V-75471, 75473,  # 
+#  75561, 75543                    #
 ####################################
 login.defs()
 {
