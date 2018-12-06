@@ -245,6 +245,15 @@ vlock_config()
 {
 dpkg -i deb_packages/vlock_2.2.2-5_amd64.deb
 }
+####################################
+#    Wuzah/OSSEC Active Response   #
+#    STIG Vul ID: V-75487          #
+####################################
+wuzah_rule()
+{
+printf '\n# STIG Vul ID: V-75487\n<command>\n<name>disable-sguild-account</name>\n<executable>disable-sguild-account.sh</executable>\n<expect>user</expect>\n<timeout_allowed>yes</timeout_allowed>\n</command>\n' >> /var/ossec/etc/ossec.conf 
+printf '\n<active-response>\n<!-- This response is going to execute the disable-sguild-account.\n- command for every event that fires rule 30414\n- This will disable to users access to kibana/squil/squert\n- to renable it the user must change his/her password using so-user-passwd\n-->\n<command>disable-sguild-account</command>\n<location>local</location>\n<rules_id>30414</rules_id>\n</active-response>\n' >> /var/ossec/etc/ossec.conf
+}
 
 #################################
 #  Where the Magic Happens !!!  #
