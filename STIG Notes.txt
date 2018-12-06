@@ -1,0 +1,132 @@
+STIG checks using alternate control methods.
+
+Vul ID: V-75815 
+
+Rule Title: The Ubuntu operating system must synchronize internal information system clocks to the authoritative time source when the time difference is greater than one second.
+
+Ubuntu's default install now uses timesyncd instead of ntpd. We can query the status of timesyncd by running timedatectl with no arguments.  Look for  Network time on: yes
+A list of the configured ntp servers can be found in /etc/ntp.conf
+
+
+Vul ID: V-75827
+
+Rule Title: The Ubuntu operating system must not permit direct logons to the root account using remote access via SSH.
+
+# grep PermitRootLogin /etc/ssh/sshd_config
+PermitRootLogin no
+
+Default install returns 
+PermitRootLogin prohibit-password
+
+Change to: 
+PermitRootLogin no
+
+
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+
+Issue
+Failed apache logins are not alerting properly to Squil/Wazah
+
+pulled apache errorlog for failed user:
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana
+
+
+
+
+
+
+tested log error using  /var/ossec/bin/ossec-logtest
+
+**Phase 1: Completed pre-decoding.
+       full event: '[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana'
+       timestamp: '(null)'
+       hostname: 'Sec-Onion-Master'
+       program_name: '(null)'
+       log: '[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana'
+
+**Phase 2: Completed decoding.
+       decoder: 'apache-errorlog'
+       srcip: '192.168.1.103'
+       srcport: '53967'
+       id: 'AH01807'
+       username: 'test2'
+
+**Phase 3: Completed filtering (rules).
+       Rule id: '30301'
+       Level: '0'
+       Description: 'Apache error messages grouped.'
+
+	   
+Made the following change to rule 30308 in /var/ossec/rules/0250-apache_rules.xml
+
+ <rule id="30308" level="5">
+    <if_sid>30302</if_sid>
+    <id>AH01617|AH01807|AH01694|AH01695|AH02009|AH02010</id>
+    <description>Apache: User authentication failed.</description>
+    <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_35.7.d,gdpr_IV_32.2,</group>
+  </rule>
+
+  TO
+  
+  <rule id="30308" level="5">
+    <if_sid>30301</if_sid>
+    <id>AH01617|AH01807|AH01694|AH01695|AH02009|AH02010</id>
+    <description>Apache: User authentication failed.</description>
+    <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_35.7.d,gdpr_IV_32.2,</group>
+  </rule>
+
+  
+Tested log error using  /var/ossec/bin/ossec-logtest
+
+results
+
+**Phase 1: Completed pre-decoding.
+       full event: '[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana'
+       timestamp: '(null)'
+       hostname: 'Sec-Onion-Master'
+       program_name: '(null)'
+       log: '[Thu Dec 06 15:06:10.190303 2018] [auth_form:error] [pid 28278] [client 192.168.1.103:53967] AH01807: user 'test2': authentication failure for "/dologin.html": password Mismatch, referer:https://192.168.1.129/app/kibana'
+
+**Phase 2: Completed decoding.
+       decoder: 'apache-errorlog'
+       srcip: '192.168.1.103'
+       srcport: '53967'
+       id: 'AH01807'
+       username: 'test2'
+
+**Phase 3: Completed filtering (rules).
+       Rule id: '30308'
+       Level: '5'
+       Description: 'Apache: User authentication failed.'
+**Alert to be generated.
+
+
+New OSSEC Rule to include username (will be needed for active response)
+
+<decoder name="apache24-errorlog-ip-port">
+    <parent>apache-errorlog</parent>
+    <prematch offset="after_parent">[client \S+:\d+] \S+:</prematch>
+    <regex offset="after_parent">[client (\S+):(\d+)] (\S+): user '(\w+)'</regex>
+    <order>srcip,srcport,id,username</order>
+</decoder>
+
+Added rule to alert on multiple failed logins by the same user
+<rule id="30414" level="8" frequency="3" timeframe="60">
+    <if_matched_sid>30308</if_matched_sid>
+    <same_user/>
+    <description>Apache: Multiple authentication failures with invalid user.</description>
+    <group>authentication_failures,pci_dss_10.2.4,pci_dss_10.2.5,pci_dss_11.4,gdpr_IV_35.7.d,gdpr_IV_32.2,</group>
+  </rule>
+  
+  
+
+
