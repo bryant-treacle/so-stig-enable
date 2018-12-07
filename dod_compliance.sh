@@ -279,3 +279,6 @@ ntp_maxpoll
 sysctl_conf
 auditd
 pki_packages
+sudoers_config
+vlock_config
+wuzah_rule
