@@ -40,6 +40,7 @@ echo "Would you like to enforece DoD Stigs on this server? (Y/n)"
 read user_continue_prompt
 
 if [ ${user_continue_prompt,,} != "y" ] ; then
+    echo "Exiting script!"
     exit
 fi
 }
