@@ -1,6 +1,14 @@
 # Security Onion DoD Stig Compliance
 This script will add additional the below controls to Security Onion 16.04.x in accordance with DoD RMF/STIG guidelines.  
 
+## Usage:
+    This script contains all necessary additional deb packages required for STIG compliance.  
+    1. Download or Clone the Repo
+    2. If download unzip using *unzip security_onion_dod_compliance-master.zip*
+    3. cd security_onion_dod_compliance-master/
+    4. sudo chmod 755 dod_compliance.sh
+    5. sudo ./dod_compliance.sh
+    
 ## Login Banner:
     - Add SSH, Web, and Desktop Environment DoD consent banners prior to granting user access to the system.
     - Enforce DoD password policies to local user and Kibana/Sguil/Squert accounts.
@@ -14,7 +22,7 @@ This script will add additional the below controls to Security Onion 16.04.x in 
     - For local server accounts you will need to change to run sudo passwd <locked user> commamnd to re-enable the account.
     - For Kibana/Sguil/Squert accounts you will need to run the so-user-passwd command to re-enable the account.
        
-## File list
+## File list:
 
     - dod_50-gnome.conf - session-setup-script added to generate desktop environment DoD consent popup.  To customize the test, add your text surrounded by quotes after --text switch.
 
