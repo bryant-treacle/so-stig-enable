@@ -126,6 +126,8 @@ sudo cp files/dod_common-password /etc/pam.d/common-password
 sudo dpkg -i deb_packages/libpam-cracklib_1.1.8-3.2ubuntu2_amd64.deb
 sudo cp files/dod_sguil_password.sh /usr/sbin/so-user-add-dod
 sudo chmod 755 /usr/sbin/so-user-add-dod
+sudo cp files/so-user-passwd-dod /usr/sbin/so-user-passwd-dod
+sudo chmod 755 /usr/sbin/so-user-passwd-dod
 # Adding dictionary password check requirement
 echo "dictcheck=1" >> /etc/security/pwquality.conf
 }
