@@ -253,6 +253,12 @@ wuzah_rule()
 {
 printf '\n# STIG Vul ID: V-75487\n<command>\n<name>disable-sguild-account</name>\n<executable>disable-sguild-account.sh</executable>\n<expect>user</expect>\n<timeout_allowed>yes</timeout_allowed>\n</command>\n' >> /var/ossec/etc/ossec.conf 
 printf '\n<active-response>\n<!-- This response is going to execute the disable-sguild-account.\n- command for every event that fires rule 30414\n- This will disable to users access to kibana/squil/squert\n- to renable it the user must change his/her password using so-user-passwd\n-->\n<command>disable-sguild-account</command>\n<location>local</location>\n<rules_id>30414</rules_id>\n</active-response>\n' >> /var/ossec/etc/ossec.conf
+chmod 440 0025-apache_decoders.xml && chown root:root 0025-apache_decoders.xml
+cp 0025-apache_decoders.xml /var/ossec/etc/decoders/
+chmod 550 0250-apache_rules.xml && chown root:root 0250-apache_rules.xml
+cp 0250-apache_rules.xml /var/ossec/rules/
+chmod 755 disable-sguild-account.sh
+cp disable-sguild-account.sh /var/ossec/active-response/bin/
 }
 
 #################################
