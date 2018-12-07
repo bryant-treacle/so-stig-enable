@@ -255,6 +255,25 @@ sudo cp wazuh_ossec/disable-sguild-account.sh /var/ossec/active-response/bin/
 sudo so-ossec-restart && so-ossec-agent-restart
 }
 
+###################
+#  Reboot Option  #
+###################
+reboot_question()
+{
+echo""
+echo "The DoD consent splash page for GUI login requires a reboot."
+echo ""
+echo "Would you like to reboot now? (Y/n)"
+read user_reboot_option
+if [ ${user_reboot_option,,} != "y" ] ; then
+    echo "Please reboot at your ealiest convenience."
+    exit
+else 
+    echo ""
+    echo "system is rebooting"
+    sudo reboot
+fi
+}
 #################################
 #  Where the Magic Happens !!!  #
 #################################
@@ -275,3 +294,4 @@ pki_packages
 sudoers_config
 vlock_config
 wuzah_rule
+reboot_question
