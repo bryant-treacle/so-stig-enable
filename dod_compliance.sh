@@ -28,47 +28,51 @@ welcome_script()
 {
 cat << EOF 
 
-This script will make the following changes to Security Onion 16.04 in order to meet DoD RMF Requirements:
-    - Add DoD login banner (for SSH and Desktop enviroment logins)
-    - Lock account after 3 failed login attempts
-    - Enforce DoD password complexity (Local accounts and sguil/kibana)
+This script will make the following changes to Security Onion 16.04 in order to meet DoD STIG Requirements for Canonical Ubuntu 16.04 EXCEPT:
+    - CAT I STIG Vul ID: V-75503 - The requirement to use FIPS 140-2 Certified Modules.  This requires a subscription to Ubuntu Advantage Advanced
+    - CAT I STIG Vul ID: V-78005 - The system must use a DoD-approved virus scan program (unique to each installation).   
+    - CAT I STIG Vul ID: V-75505,75507 - Systems booted with a BIOS must require authentication (unique to each installation)
+    - CAT II STIGs dealing with file permissions for individual users (unique to each installation).
+    - CAT II STIGs dealing with Common Access Card login requirments.  The required packages are installed.
 
 EOF
+echo "Would you like to enforece DoD Stigs on this server? (Y/n)
+read user_continue_prompt
+
+if [ ${user_continue_prompt,,} != "y" ] ; then
+    exit
+fi
 }
 
-#######################
-#  DoD login Banners 
-#  STIG Vul ID's: V-75393, 75435 
-#######################
+###################################
+#         DoD login Banners       #
+#  STIG Vul ID's: V-75393, 75435  #
+###################################
 login_banner()
 {
-echo "Adding DoD login Message Banner"
-# This will create a SSH login banner
-# Move login banner to /etc directory
-sudo cp dod_login_banner /etc/dod_login_banner
-
 # Add banner file location to sshd_config
 # Vul ID: V-75825 | Severity: CAT II
 sed -i 's|#Banner /etc/issue.net|Banner /etc/dod_login_banner|g' /etc/ssh/sshd_config
+sudo cp files/dod_login_banner /etc/dod_login_banner
 systemctl restart sshd
 
 # This will add a DoD consent splash page for web access
 # This only works because Apache2 will load index.html before index.php.  This can be modified in the
 # /etc/apache2/mods-enabled/dir.conf
-cp dod_index.html /var/www/so/index.html
-cp dod_banner.css /var/www/so/css
+cp files/dod_index.html /var/www/so/index.html
+cp files/dod_banner.css /var/www/so/css
 
 # DoD consent Splash Page for gnome login.
-cp dod_50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
+cp files/dod_50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
 }
 
-########################
-#  Local Login Controls  #
-#  STIG Vul ID: V-75479, 75487, 75493
-########################
+########################################
+#           Local Login Controls       #
+#  STIG Vul ID: V-75479, 75487, 75493  #
+########################################
 common_auth()
 {
-sudo cp dod_common-auth /etc/pam.d/common-auth
+sudo cp files/dod_common-auth /etc/pam.d/common-auth
 # Force pam modules to take updates without reboot
 pam-auth-update --force
 }
@@ -117,12 +121,10 @@ sudo chmod 755 /etc/profile.d/autologout.sh
 #################################################
 password_complexity()
 {
-sudo cp dod_common-password /etc/pam.d/common-password
+sudo cp files/dod_common-password /etc/pam.d/common-password
 sudo dpkg -i deb_packages/libpam-cracklib_1.1.8-3.2ubuntu2_amd64.deb
-#Backing up old so-user-add script
-sudo mv /usr/sbin/so-user-add /usr/sbin/.so-user-add.bak
-sudo cp dod_sguil_password.sh /usr/sbin/so-user-add
-sudo chmod 755 /usr/sbin/so-user-add
+sudo cp files/dod_sguil_password.sh /usr/sbin/so-user-add-dod
+sudo chmod 755 /usr/sbin/so-user-add-dod
 # Adding dictionary password check requirement
 echo "dictcheck=1" >> /etc/security/pwquality.conf
 }
@@ -146,27 +148,17 @@ sudo systemctl restart sshd.service
 #######################################
 crtl_alt_del()
 {
-mkdir /etc/dconf/db/local.d/
-printf '# DoD Stig Vul ID: V-80957\n[org/gnome/settings-daemon/plugins/media-keys]\nlogout="" ' > /etc/dconf/db/local.d/00-disable-CAD
-dconf update
+sudo mkdir /etc/dconf/db/local.d/
+sudo printf '# DoD Stig Vul ID: V-80957\n[org/gnome/settings-daemon/plugins/media-keys]\nlogout="" ' > /etc/dconf/db/local.d/00-disable-CAD
+sudo dconf update
 }
-q
 ########################################
 #  USB Mounting disabled               #
 #  Severity: CAT II | Vul ID: V-75531  #
 ########################################
 usb_mount_disable()
 {
-echo "install usb-storage /bin/true" >> /etc/modprobe.d/dod_stig.conf
-}
-
-########################################
-#  /var/lib/docker group owner         #
-#  Severity: CAT II | Vul ID: V-75557  #
-########################################
-docker_group_owner()
-{
-chown -R root:root /var/lib/docker/
+sudo echo "install usb-storage /bin/true" >> /etc/modprobe.d/dod_stig.conf
 }
 
 #######################################
@@ -175,8 +167,8 @@ chown -R root:root /var/lib/docker/
 #######################################
 ntp_maxpoll()
 {
-echo "maxpoll = 17" >> /etc/ntp.conf
-systemctl restart ntp
+sudo echo "maxpoll = 17" >> /etc/ntp.conf
+sudo systemctl restart ntp
 }
 
 #######################################
@@ -186,13 +178,13 @@ systemctl restart ntp
 #######################################
 sysctl_conf()
 {
-sed -i 's|#net.ipv4.tcp_syncookies = 1|net.ipv4.tcp_syncookies = 1|g' /etc/sysctl.conf
-sed -i 's|#net.ipv4.conf.default.accept_redirects = 0|net.ipv4.conf.default.accept_redirects = 0|g' /etc/sysctl.conf
-sed -i 's|#net.ipv4.conf.all.send_redirects = 0|net.ipv4.conf.all.send_redirects = 0|g' /etc/sysctl.conf
-sed -i 's|#net.ipv4.ip_forward=1|net.ipv4.ip_forward = 0|g' /etc/sysctl.conf
-printf '\n#DoD STIG Vul ID: V-75883\nnet.ipv4.conf.default.send_redirects=0' >> /etc/sysctl.conf
+sudo sed -i 's|#net.ipv4.tcp_syncookies = 1|net.ipv4.tcp_syncookies = 1|g' /etc/sysctl.conf
+sudo sed -i 's|#net.ipv4.conf.default.accept_redirects = 0|net.ipv4.conf.default.accept_redirects = 0|g' /etc/sysctl.conf
+sudo sed -i 's|#net.ipv4.conf.all.send_redirects = 0|net.ipv4.conf.all.send_redirects = 0|g' /etc/sysctl.conf
+sudo sed -i 's|#net.ipv4.ip_forward=1|net.ipv4.ip_forward = 0|g' /etc/sysctl.conf
+sudo printf '\n#DoD STIG Vul ID: V-75883\nnet.ipv4.conf.default.send_redirects=0' >> /etc/sysctl.conf
 # Force sysctl changes without reboot
-sysctl -p 
+sudo sysctl -p 
 }
 
 ########################################
@@ -203,19 +195,19 @@ sysctl -p
 auditd()
 {
 # Installing auditd deb packages + dependences
-dpkg -i deb_packages/libauparse0_2.4.5-1ubuntu2.1_amd64.deb
-dpkg -i deb_packages/auditd_2.4.5-1ubuntu2_amd64.deb
-dpkg -i deb_packages/libprelude2v5_1.0.0-11.7ubuntu1_amd64.deb
-dpkg -i deb_packages/audispd-plugins_2.4.5-1ubuntu2_amd64.deb
+sudo dpkg -i deb_packages/libauparse0_2.4.5-1ubuntu2.1_amd64.deb
+sudo dpkg -i deb_packages/auditd_2.4.5-1ubuntu2_amd64.deb
+sudo dpkg -i deb_packages/libprelude2v5_1.0.0-11.7ubuntu1_amd64.deb
+sudo dpkg -i deb_packages/audispd-plugins_2.4.5-1ubuntu2_amd64.deb
 #Set Max_log_file_action from Rotate to Syslog
-sed -i 's|max_log_file_action = ROTATE|max_log_file_action = SYSLOG|g' /etc/audit/auditd.conf
-sed -i 's|disk_full_action = SUSPEND|disk_full_action = HALT|g' /etc/audit/auditd.conf
-sed -i 's|disk_full_action = ignore|disk_full_action = SYSLOG|g' /etc/audisp/audisp-remote.conf
-sed -i 's|##enable_krb5 = no|enable_krb5 = yes|g' /etc/audisp/audisp-remote.conf
-sed -i 's|network_failure_action = stop|network_failure_action = halt|g' /etc/audisp/audisp-remote.conf
+sudo sed -i 's|max_log_file_action = ROTATE|max_log_file_action = SYSLOG|g' /etc/audit/auditd.conf
+sudo sed -i 's|disk_full_action = SUSPEND|disk_full_action = HALT|g' /etc/audit/auditd.conf
+sudo sed -i 's|disk_full_action = ignore|disk_full_action = SYSLOG|g' /etc/audisp/audisp-remote.conf
+sudo sed -i 's|##enable_krb5 = no|enable_krb5 = yes|g' /etc/audisp/audisp-remote.conf
+sudo sed -i 's|network_failure_action = stop|network_failure_action = halt|g' /etc/audisp/audisp-remote.conf
 # All required audit rules have been consolidated in the audit.rules files
-cp audit.rules /etc/audit/audit.rules
-systemctl restart auditd.service
+sudo cp files/audit.rules /etc/audit/audit.rules
+sudo systemctl restart auditd.service
 }
 
 ##########################################
@@ -224,8 +216,8 @@ systemctl restart auditd.service
 ##########################################
 pki_packages()
 {
-dpkg -i deb_packages/opensc-pkcs11_0.15.0-1ubuntu1_amd64.deb
-dpkg -i deb_packages/libpam-pkcs11_0.6.8-4_amd64.deb
+sudo dpkg -i deb_packages/opensc-pkcs11_0.15.0-1ubuntu1_amd64.deb
+sudo dpkg -i deb_packages/libpam-pkcs11_0.6.8-4_amd64.deb
 }
 
 ############################################
@@ -234,7 +226,7 @@ dpkg -i deb_packages/libpam-pkcs11_0.6.8-4_amd64.deb
 ############################################
 sudoers_config()
 {
-sed -i 's|NOPASSWD|PASSWD|g' /etc/sudoers.d/securityonion-onionsalt
+sudo sed -i 's|NOPASSWD|PASSWD|g' /etc/sudoers.d/securityonion-onionsalt
 }
 
 ###################################
@@ -243,7 +235,7 @@ sed -i 's|NOPASSWD|PASSWD|g' /etc/sudoers.d/securityonion-onionsalt
 ###################################
 vlock_config()
 {
-dpkg -i deb_packages/vlock_2.2.2-5_amd64.deb
+sudo dpkg -i deb_packages/vlock_2.2.2-5_amd64.deb
 }
 ####################################
 #    Wuzah/OSSEC Active Response   #
@@ -251,14 +243,14 @@ dpkg -i deb_packages/vlock_2.2.2-5_amd64.deb
 ####################################
 wuzah_rule()
 {
-printf '\n# STIG Vul ID: V-75487\n<command>\n<name>disable-sguild-account</name>\n<executable>disable-sguild-account.sh</executable>\n<expect>user</expect>\n<timeout_allowed>yes</timeout_allowed>\n</command>\n' >> /var/ossec/etc/ossec.conf 
-printf '\n<active-response>\n<!-- This response is going to execute the disable-sguild-account.\n- command for every event that fires rule 30414\n- This will disable to users access to kibana/squil/squert\n- to renable it the user must change his/her password using so-user-passwd\n-->\n<command>disable-sguild-account</command>\n<location>local</location>\n<rules_id>30414</rules_id>\n</active-response>\n' >> /var/ossec/etc/ossec.conf
-chmod 440 0025-apache_decoders.xml && chown root:root 0025-apache_decoders.xml
-cp 0025-apache_decoders.xml /var/ossec/etc/decoders/
-chmod 550 0250-apache_rules.xml && chown root:root 0250-apache_rules.xml
-cp 0250-apache_rules.xml /var/ossec/rules/
-chmod 755 disable-sguild-account.sh
-cp disable-sguild-account.sh /var/ossec/active-response/bin/
+sudo printf '\n# STIG Vul ID: V-75487\n<command>\n<name>disable-sguild-account</name>\n<executable>disable-sguild-account.sh</executable>\n<expect>user</expect>\n<timeout_allowed>yes</timeout_allowed>\n</command>\n' >> /var/ossec/etc/ossec.conf 
+sudo printf '\n<active-response>\n<!-- This response is going to execute the disable-sguild-account.\n- command for every event that fires rule 30414\n- This will disable to users access to kibana/squil/squert\n- to renable it the user must change his/her password using so-user-passwd\n-->\n<command>disable-sguild-account</command>\n<location>local</location>\n<rules_id>30414</rules_id>\n</active-response>\n' >> /var/ossec/etc/ossec.conf
+sudo chmod 440 files/0025-apache_decoders.xml && chown root:root files/0025-apache_decoders.xml
+sudo cp files/0025-apache_decoders.xml /var/ossec/etc/decoders/
+sudo chmod 550 files/0250-apache_rules.xml && chown root:root files/0250-apache_rules.xml
+sudo cp files/0250-apache_rules.xml /var/ossec/rules/
+sudo chmod 755 files/disable-sguild-account.sh && chown root:root files/disable-sguild-account.sh
+sudo cp files/disable-sguild-account.sh /var/ossec/active-response/bin/
 }
 
 #################################
@@ -274,7 +266,6 @@ password_complexity
 sshd_conf
 crtl_alt_del
 usb_mount_disable
-#docker_group_owner (getting hung up.  Not sure if docker containers need to be stoped)
 ntp_maxpoll
 sysctl_conf
 auditd
