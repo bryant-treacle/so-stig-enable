@@ -2,16 +2,18 @@
 This script will add additional the below controls to Security Onion 16.04.x in accordance with DoD RMF/STIG guidelines.  
 
 ## Login Banner:
-
     - Add SSH, Web, and Desktop Environment DoD consent banners prior to granting user access to the system.
     - Enforce DoD password policies to local user and Kibana/Sguil/Squert accounts.
 
 ## Password Compliance:
     - Enforces DoD Password Policies on any local server account created after the script.
     - Adds Compliance to the following STIG Finding IDs using the Application Security and Development Security Technical Implementation Guide.
-
-
-
+    
+## Bruteforce account lockout:
+    - Enforces DoD brute force account lockout requirements.
+    - For local server accounts you will need to change to run sudo passwd <locked user> commamnd to re-enable the account.
+    - For Kibana/Sguil/Squert accounts you will need to run the so-user-passwd command to re-enable the account.
+       
 ## File list
 
     - dod_50-gnome.conf - session-setup-script added to generate desktop environment DoD consent popup.  To customize the test, add your text surrounded by quotes after --text switch.
