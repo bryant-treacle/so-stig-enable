@@ -24,6 +24,6 @@ auth    required                        pam_tally2.so    onerr=fail deny=3 unloc
 # since the modules above will each just jump around
 auth    required                        pam_permit.so
 # DoD STIG Severity: CAT II | Vul ID: V-75493 enforce a delay of at least 4 seconds between logon prompts
-auth    required                        pam_faildelay.so    delay=400000
+auth    required                        pam_faildelay.so    delay=4000000
 # end of pam-auth-update config
 
