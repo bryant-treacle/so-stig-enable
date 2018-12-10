@@ -83,6 +83,15 @@ max_login_limit()
 {
 echo '* hard maxlogins 10' >> /etc/security/limits.conf
 }
+
+#######################
+#     Remove telnet   #
+#  STIG Vul ID 75797  #
+#######################
+telnet_remove()
+{
+sudo apt-get -y remove telnet
+}
 ####################################
 #           login defs             #
 #  STIG Vul ID's: V-75471, 75473,  # 
@@ -281,6 +290,7 @@ fi
 welcome_script
 login_banner
 common_auth
+telnet_remove
 login.defs
 inactive_accounts
 inactivity_logout
