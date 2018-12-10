@@ -74,8 +74,6 @@ cp files/dod_50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
 common_auth()
 {
 sudo cp files/dod_common-auth /etc/pam.d/common-auth
-# Force pam modules to take updates without reboot
-pam-auth-update --force
 }
 #####################
 #  Max Login limit  #
