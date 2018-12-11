@@ -285,6 +285,21 @@ else
 fi
 }
 #################################
+#      user/group ownership     #
+#  STIG Vul ID's: 75555, 75557  #
+#################################
+file_ownership()
+{
+find / -nogroup >> user_group_permission 2>/dev/null
+find / -nouser  >> user_group_permission 2>/dev/null
+
+for file in $(cat user_group_permission); do
+chown root:root $file
+done
+
+rm user_group_permission
+}
+#################################
 #  Where the Magic Happens !!!  #
 #################################
 welcome_script
@@ -305,4 +320,5 @@ pki_packages
 sudoers_config
 vlock_config
 wuzah_rule
+file_ownership
 reboot_question
