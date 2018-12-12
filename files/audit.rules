@@ -176,6 +176,8 @@
 # DoD STIG Vul ID: V-80969
 -a always,exit -F path=/usr/bin/chcon -F perm=x -F auid>=1000 -F auid!=4294967295 -k perm_chng
 
+# DoD STIG Vul ID: V-75693
+-a always,exit -F path=/usr/bin/chfn -F perm=x -F auid>=1000 -F auid!=4294967295 -k privileged-gpasswd
 
 
 
