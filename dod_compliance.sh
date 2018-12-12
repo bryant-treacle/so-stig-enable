@@ -290,15 +290,31 @@ fi
 #################################
 file_ownership()
 {
+echo ""
+echo "Checking filesystem to ensure all files have valid owners and groups"
+echo ""
+echo "This may take a while."
 find / -nogroup >> user_group_permission 2>/dev/null
 find / -nouser  >> user_group_permission 2>/dev/null
 
-for file in $(cat user_group_permission); do
-chown root:root $file
-done
-
-rm user_group_permission
+if [ -s user_group_permission ]; then
+   echo ""
+   echo "The below files are not owned by a user or group."
+   echo ""
+   echo "$(<user_group_permission)"
+   echo ""
+   echo "Would you like to assign root as the user and group now? (Y/n)"
+   read user_file_input
+   if [ ${user_file_input,,} == "y"] ; then
+      for file in $(cat user_group_permission); do
+          chown root:root $file
+      done
+   else
+      echo "This will reamain a finding until approprate file permissions are assigned to the files listed in the user_group_permission file"
+   fi
+fi
 }
+
 #################################
 #  Where the Magic Happens !!!  #
 #################################
