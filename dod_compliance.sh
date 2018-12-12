@@ -305,7 +305,7 @@ if [ -s user_group_permission ]; then
    echo ""
    echo "Would you like to assign root as the user and group now? (Y/n)"
    read user_file_input
-   if [ ${user_file_input,,} == "y"] ; then
+   if [ ${user_file_input,,} == "y" ] ; then
       for file in $(cat user_group_permission); do
           chown root:root $file
       done
