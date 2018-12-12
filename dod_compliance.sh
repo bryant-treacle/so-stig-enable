@@ -321,6 +321,7 @@ fi
 welcome_script
 login_banner
 common_auth
+max_login_limit
 telnet_remove
 login.defs
 inactive_accounts
