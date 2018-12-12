@@ -271,7 +271,7 @@ sudo so-ossec-restart && so-ossec-agent-restart
 reboot_question()
 {
 echo""
-echo "The DoD consent splash page for GUI login requires a reboot."
+echo "DoD Stigs have been enforeced on this machine.  Some of the changes will require a reboot."
 echo ""
 echo "Would you like to reboot now? (Y/n)"
 read user_reboot_option
