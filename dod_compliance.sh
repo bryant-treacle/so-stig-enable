@@ -303,7 +303,10 @@ if [ -s invalid_user_group ]; then
    echo "$(<invalid_user_group)"
    echo ""
    echo "The above files are not owned by a valid user or group."
-   echo ""
+   echo "Below are the timeframes per node type:"
+   echo "Master Node: approx 5 min"
+   echo "Storage Node: approx 5 mins"
+   echo "Forward Nodes: approx 30 min"
    echo "Would you like to assign root as the user and group now? (Y/n)"
    read user_file_input
    if [ ${user_file_input,,} == "y" ] ; then
