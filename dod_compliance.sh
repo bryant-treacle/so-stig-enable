@@ -36,7 +36,7 @@ This script will make the following changes to Security Onion 16.04 in order to 
     - CAT II STIGs dealing with Common Access Card login requirments.  The required packages are installed.
 
 EOF
-echo "Would you like to enforece DoD Stigs on this server? (Y/n)"
+echo "Would you like to enforce DoD Stigs on this server? (Y/n)"
 read user_continue_prompt
 
 if [ ${user_continue_prompt,,} != "y" ] ; then
