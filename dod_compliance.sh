@@ -254,13 +254,17 @@ sudo dpkg -i deb_packages/vlock_2.2.2-5_amd64.deb
 ####################################
 wuzah_rule()
 {
+#remove the "/ossec_config" string that closes ossec_config xml element from the end of the ossec.conf file.
 sudo sed -i 's|</ossec_config>||g' /var/ossec/etc/ossec.conf
 sudo printf '\n# STIG Vul ID: V-75487\n<command>\n<name>disable-sguild-account</name>\n<executable>disable-sguild-account.sh</executable>\n<expect>user</expect>\n<timeout_allowed>yes</timeout_allowed>\n</command>\n' >> /var/ossec/etc/ossec.conf 
-sudo printf '\n<active-response>\n<!-- This response is going to execute the disable-sguild-account.\n- command for every event that fires rule 30414\n- This will disable to users access to kibana/squil/squert\n- to renable it the user must change his/her password using so-user-passwd\n-->\n<command>disable-sguild-account</command>\n<location>local</location>\n<rules_id>30414</rules_id>\n</active-response>\n\n</ossec_config>' >> /var/ossec/etc/ossec.conf
-sudo chmod 440 wazuh_ossec/0025-apache_decoders.xml && chown root:root wazuh_ossec/0025-apache_decoders.xml
-sudo cp wazuh_ossec/0025-apache_decoders.xml /var/ossec/etc/decoders/0025-apache_decoders.xml
-sudo chmod 550 wazuh_ossec/0250-apache_rules.xml && chown root:root wazuh_ossec/0250-apache_rules.xml
-sudo cp wazuh_ossec/0250-apache_rules.xml /var/ossec/rules/0250-apache_rules.xml
+sudo printf '\n<active-response>\n<!-- This response is going to execute the disable-sguild-account.\n- command for every event that fires rule 30414\n- This will disable to users access to kibana/squil/squert\n- to renable it the user must change his/her password using so-user-passwd\n-->\n<command>disable-sguild-account</command>\n<location>local</location>\n<rules_id>30414</rules_id>\n</active-response>\n' >> /var/ossec/etc/ossec.conf
+# close the ossec_config xml element in the ossec.conf file
+sudo printf '\n</ossec_config>' >> /var/ossec/etc/ossec.conf
+# Added upstream after 16.04.5.5
+#sudo chmod 440 wazuh_ossec/0025-apache_decoders.xml && chown root:root wazuh_ossec/0025-apache_decoders.xml
+#sudo cp wazuh_ossec/0025-apache_decoders.xml /var/ossec/etc/decoders/0025-apache_decoders.xml
+#sudo chmod 550 wazuh_ossec/0250-apache_rules.xml && chown root:root wazuh_ossec/0250-apache_rules.xml
+#sudo cp wazuh_ossec/0250-apache_rules.xml /var/ossec/rules/0250-apache_rules.xml
 sudo chmod 755 wazuh_ossec/disable-sguild-account.sh && chown root:root wazuh_ossec/disable-sguild-account.sh
 sudo cp wazuh_ossec/disable-sguild-account.sh /var/ossec/active-response/bin/
 sudo so-ossec-restart && so-ossec-agent-restart
