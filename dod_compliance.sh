@@ -318,7 +318,7 @@ if [ -s invalid_user_group ]; then
           chown root:root $file
       done
    else
-      echo "This will reamain a finding until approprate file permissions are assigned to the files listed in the invalid_user_group file"
+      echo "This will remain a finding until approprate file permissions are assigned to the files listed in the invalid_user_group file"
    fi
 fi
 }
