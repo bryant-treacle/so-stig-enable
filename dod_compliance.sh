@@ -257,7 +257,7 @@ wuzah_rule()
 #remove the "/ossec_config" string that closes ossec_config xml element from the end of the ossec.conf file.
 sudo sed -i 's|</ossec_config>||g' /var/ossec/etc/ossec.conf
 sudo printf '\n# STIG Vul ID: V-75487\n<command>\n<name>disable-sguild-account</name>\n<executable>disable-sguild-account.sh</executable>\n<expect>user</expect>\n<timeout_allowed>yes</timeout_allowed>\n</command>\n' >> /var/ossec/etc/ossec.conf 
-sudo printf '\n<active-response>\n<!-- This response is going to execute the disable-sguild-account.\n- command for every event that fires rule 30414\n- This will disable to users access to kibana/squil/squert\n- to renable it the user must change his/her password using so-user-passwd\n-->\n<command>disable-sguild-account</command>\n<location>local</location>\n<rules_id>30414</rules_id>\n</active-response>\n' >> /var/ossec/etc/ossec.conf
+sudo printf '\n<active-response>\n<!-- This response is going to execute the disable-sguild-account.\n- command for every event that fires rule 111127\n- This will disable to users access to kibana/squil/squert\n- to renable it the user must change his/her password using so-user-passwd\n-->\n<command>disable-sguild-account</command>\n<location>local</location>\n<rules_id>111127</rules_id>\n</active-response>\n' >> /var/ossec/etc/ossec.conf
 # close the ossec_config xml element in the ossec.conf file
 sudo printf '\n</ossec_config>' >> /var/ossec/etc/ossec.conf
 # Added upstream after 16.04.5.5
@@ -318,7 +318,7 @@ if [ -s invalid_user_group ]; then
           chown root:root $file
       done
    else
-      echo "This will remain a finding until approprate file permissions are assigned to the files listed in the invalid_user_group file"
+      echo "STIG Vul ID's: 75555, 75557 will remain a finding until approprate file permissions have been assigned to the files listed in the invalid_user_group file"
    fi
 fi
 }
