@@ -102,7 +102,8 @@ login.defs()
 sed -i 's|PASS_MIN_DAYS.*|PASS_MIN_DAYS   1|g' /etc/login.defs
 sed -i 's|PASS_MAX_DAYS.*|PASS_MAX_DAYS   60|g' /etc/login.defs
 echo "CREATE_HOME yes" >> /etc/login.defs
-sed -i 's|UMASK.*|UMASK 077|g' /etc/login.defs
+#sed -i 's|UMASK.*|UMASK 077|g' /etc/login.defs
+echo "umask 077" >> /etc/profile
 }
 ################################
 #  Account Inactivity disable
