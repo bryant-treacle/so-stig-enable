@@ -19,7 +19,7 @@
 #
 # Last Modified: 7 Ded 18
 
-
+. /usr/sbin/so-elastic-common
 
 ####################
 #  Welcome Script  #
