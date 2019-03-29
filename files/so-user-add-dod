@@ -54,11 +54,11 @@ read -s -p "User Password: " USER_PASS
 #Check if the password Length is greater or equal to 15 characters
 if [[ ${#USER_PASS} -ge 15 ]]; then
     # Check if the password has at least 2 upper case letters
-    if [[ "$USER_PASS" =~ [A-Z]{2} ]]; then
+    if [[ "$USER_PASS" =~ (.*[A-Z].*){2} ]]; then
         # Check if the password has at least 2 digits
-        if [[ "$USER_PASS" =~ [0-9]{2} ]]; then
+        if [[ "$USER_PASS" =~ (.*[0-9].*){2} ]]; then
             # Check if the password has at least 2 special characters
-            if [[ "$USER_PASS" =~ [!\@#\$%^\&*()_+]{2} ]]; then
+            if [[ "$USER_PASS" =~ (.*[!\@#\$%^\&*()_+-=].*){2} ]]; then
                 dod_user_pass_verify
             else
                 echo "Please use at least 2 of the following special characters !@#$%^&*()_+ "
@@ -83,6 +83,7 @@ fi
 #############################################
 dod_user_pass_verify()
 {
+echo ""
 echo "Please verify password."
 read -s -p "verify: " USER_PASS_VERIFY
 dod_pass_compare
