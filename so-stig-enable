@@ -27,13 +27,24 @@
 welcome_script()
 {
 cat << EOF 
+This script will apply Canical Ubuntu 16.04 LTS STIG’s to Security Onion Systems 16.04.x running in one of the following roles:
 
-This script will make the following changes to Security Onion 16.04 in order to meet DoD STIG Requirements for Canonical Ubuntu 16.04 EXCEPT:
-    - CAT I STIG Vul ID: V-75503 - The requirement to use FIPS 140-2 Certified Modules.  This requires a subscription to Ubuntu Advantage Advanced
-    - CAT I STIG Vul ID: V-78005 - The system must use a DoD-approved virus scan program (unique to each installation).   
-    - CAT I STIG Vul ID: V-75505,75507 - Systems booted with a BIOS must require authentication (unique to each installation)
-    - CAT II STIGs dealing with file permissions for individual users (unique to each installation).
-    - CAT II STIGs dealing with Common Access Card login requirments.  The required packages are installed.
+    - Master
+    - Heavy Node
+    - Forward Node
+    - Storage Node  
+
+After the script has been executed, there are 35 STIG check that remain Open.  Many of them focus on local policy checks or dependent on the hardware the OS is installed on.
+The STIG Viewer and the checklist have been provided in the repo that outline the remaining check that need applied or added to the POA&M and accepted by the network's owner. 
+Below is a summary of the STIG checklist.
+
+Overall Totals
+Total: 230
+Not a Finding: 184
+Open: 35
+Not Applicable: 11
+
+Before you execute the script please verify the release version with the branch you cloned/downloaded. 
 
 EOF
 echo "Would you like to enforce DoD Stigs on this server? (Y/n)"
