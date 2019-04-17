@@ -4,10 +4,46 @@ This script will add additional the below controls to Security Onion 16.04.x in 
 ## Usage:
     This script contains all necessary additional deb packages required for STIG compliance.  
     1. Download or Clone the Repo
-    2. If download unzip using *unzip security_onion_dod_compliance-master.zip*
-    3. cd security_onion_dod_compliance-master/
-    4. sudo chmod 755 dod_compliance.sh
-    5. sudo ./dod_compliance.sh
+    2. If download unzip using *so-stig-enable.zip*
+    3. cd so-stig-enable
+    4. sudo chmod 755 so-stig-enable
+    5. sudo ./so-stig-enable
+    
+    This script will apply Canical Ubuntu 16.04 LTS STIG’s to Security Onion 16.04.5.6 when configured as a Master, Heavy Node, Forward Node, or Storage Node.  If you are running a different release, please choose the branch for that release.  
+    
+    The deb_packages folder contains all necessary packages and dependencies for use on Air Gapped networks.  If internet access is available, please run SOUP at your earliest convenience to ensure those packages are up-to-date.
+    
+    This script has been designed to be ran as many times if needed to verify updates or changes to configuration files have not overwritten any STIG requirements.
+    
+    Below are a summary of the STIG findings after the script has been executed.
+
+    Overall Totals
+    Total: 230
+    Not a Finding: 184
+    Open: 35
+    Not Applicable: 11
+
+    CAT I
+    Total: 22
+    Not a Finding: 17
+    Open: 5
+
+    CAT II
+    Total: 200
+    Not a Finding: 164
+    Open: 27
+    Not Applicable: 9
+
+    CAT III
+    Total: 8
+    Not a Finding: 3
+    Open: 3
+    Not Applicable: 2
+
+    Open: These checks are either dependent on the policies or hardware configurations of the organization and must be addressed locally.
+
+    A copy of the unclassified STIG Viewer and completed checklist has been included in the Repo.  The STIG View does require a java runtime environment in order to launch.  
+
     
 ## Login Banner:
     - Add SSH, Web, and Desktop Environment DoD consent banners prior to granting user access to the system.
