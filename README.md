@@ -42,7 +42,8 @@ This script will add additional the below controls to Security Onion 16.04.x in 
 
     Open: These checks are either dependent on the policies or hardware configurations of the organization and must be addressed locally.
 
-    A copy of the unclassified STIG Viewer and completed checklist has been included in the Repo.  The STIG View does require a java runtime environment in order to launch.  
+    A copy of the unclassified STIG Viewer and completed checklist has been included in the Repo.  
+    NOTE: The STIG View does require a java runtime environment in order to launch.  
 
     
 ## Login Banner:
@@ -52,10 +53,21 @@ This script will add additional the below controls to Security Onion 16.04.x in 
 ## Password Compliance:
     - Enforces DoD Password Policies on any local server account created after the script.
     - Adds Compliance to the following STIG Finding IDs using the Application Security and Development Security Technical Implementation Guide.
+    - To change password requirements for the Operating System modify the below line in the '/etc/pam.d/common-passwords file.
+         password requisite pam_cracklib.so minlen=15 retry=3 difok=8 ucredit=-2 lcredit=-2 dcredit=-2  ocredit=-2
+
+        - difok: number of characters that must change between the old and new passwords
+        - ucredit: Number of uppercase letters required
+        - lcredit: Number of lowercase letters required
+        - dcredit: Number of digits (numbers) required
+        - ocredit: Number of other (Special) characters required
+    
+    - To change password requirements for Kibana/Sguil/Squert accounts you can modify the number inside the {} curl brackets found after the regex pattern found in /usr/sbin/so-user-add & /usr/sbin/so-user-passwd after the script has been executed. If you want to make the change prior to running the script edit so-user-add-dod & so-user-passwd-dod files located in the files folder within the repository.
     
 ## Bruteforce account lockout:
-    - Enforces DoD brute force account lockout requirements.
-    - For local server accounts you will need to change to run sudo passwd <locked user> commamnd to re-enable the account.
+    - Enforces DoD brute force account lockout requirements and will remain locked for 30 minutes.  It is strongly recommended to have an "emergency access" account with a complex password that can be used if the admin account is locked due to failed login attempts.  To modify the lockout time modify the following line in /etc/pam.d/common-auth
+        auth    required                        pam_tally2.so    onerr=fail deny=3 unlock_time=3600
+    - For local server accounts you will need to change to run sudo passwd <locked user> command to re-enable the account.
     - For Kibana/Sguil/Squert accounts you will need to run the so-user-passwd command to re-enable the account.
        
 ## File list:
@@ -70,4 +82,4 @@ This script will add additional the below controls to Security Onion 16.04.x in 
 
     - dod_login_banner - Text file that will be displayed on any SSH login.  Uses Message of The Day (MOTD) feature in linux, and the filename/location is defined in /etc/ssh/sshd_config.
 
-    - dod_squil_password.sh  - Script to enforce DoD compliance for Squil/Kibana/Squert users.
+    - so-user-add-dod & so-user-passwd-dod - Replace so-user-add and so-user-passwd and enforces DoD compliance for Sguil/Kibana/Squert users.
