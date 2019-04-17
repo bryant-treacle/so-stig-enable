@@ -1,0 +1,517 @@
+#! /bin/bash -i
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Author: Bryant Treacle
+#
+# Date Created: 27 Nov 18
+#
+# Last Modified: 7 Ded 18
+
+#. /usr/sbin/so-elastic-common
+
+####################
+#  Welcome Script  #
+####################
+welcome_script()
+{
+cat << EOF 
+
+
+This script will apply Canical Ubuntu 16.04 LTS STIG’s to Security Onion Systems 16.04.x running in one of the following roles:
+
+    - Master
+    - Heavy Node
+    - Forward Node
+    - Storage Node  
+
+After the script has been executed, there are 35 STIG check that remain Open.  Many of them focus on local policy checks or dependent on the hardware the OS is installed on.  The STIG Viewer and the checklist have been provided in the repo and outlines the remaining check that need applied, added to the POA&M, or accepted by the Authorizing Official (AO). 
+
+Below is a summary of the STIG checklist.
+
+Overall Totals
+Total: 230
+Not a Finding: 184
+Open: 35
+Not Applicable: 11
+
+Before you execute the script please verify the release version with the branch you cloned/downloaded. 
+
+EOF
+echo "Would you like to enforce DoD Stigs on this server? (Y/n)"
+read user_continue_prompt
+
+if [ ${user_continue_prompt,,} != "y" ] ; then
+    echo -e "\e[31mExiting script!\e[0m"
+    exit
+fi
+}
+
+###################################
+#         DoD login Banners       #
+#  STIG Vul ID's: V-75393, 75435  #
+###################################
+login_banner()
+{
+# Add banner file location to sshd_config
+# Vul ID: V-75825 | Severity: CAT II
+if ! grep -q "/etc/dod_login_banner" /etc/ssh/sshd_config ; then
+    echo -e "\e[32mAdding SSH consent banner.\e[0m"
+    sed -i 's|#Banner /etc/issue.net|Banner /etc/dod_login_banner|g' /etc/ssh/sshd_config
+    cp files/dod_login_banner /etc/dod_login_banner
+    systemctl restart sshd
+else 
+    echo -e "\e[34mSSH consent banner already configured.\e[0m"
+fi 
+# This will add a DoD consent splash page for web access
+# This only works because Apache2 will load index.html before index.php.  This can be modified in the
+# /etc/apache2/mods-enabled/dir.conf 
+if [ ! -f "/var/www/so/index.html" ] ; then
+    echo -e "\e[32mAdding Web consent banner.\e[0m" 
+    cp files/dod_index.html /var/www/so/index.html
+    cp files/dod_banner.css /var/www/so/css
+else
+    echo -e "\e[34mWeb consent banner already configured.\e[0m"
+fi
+
+# DoD consent Splash Page for gnome login.
+if ! grep -q "DoD consent login Banner" /usr/share/lightdm/lightdm.conf.d/50-gnome.conf ; then
+    echo -e "\e[32mAdding GUI login consent banner.\e[0m"
+    cp files/dod_50-gnome.conf /usr/share/lightdm/lightdm.conf.d/50-gnome.conf
+else
+    echo -e "\e[34mGUI login consent banner already configured.\e[0m"
+fi
+}
+
+########################################
+#           Local Login Controls       #
+#  STIG Vul ID: V-75479, 75487, 75493  #
+########################################
+common_auth()
+{
+if ! grep -q "DoD STIG" /etc/pam.d/common-auth ; then 
+    echo -e "\e[32mAdding login restriction to pam.d/common-auth\e[0m"
+    cp files/dod_common-auth /etc/pam.d/common-auth
+else
+    echo -e "\e[34mLogin restrictions to pam.d/common-auth already configured.\e[0m"
+fi
+}
+#####################
+#  Max Login limit  #
+#  Vul ID: V-75443  #
+#####################
+max_login_limit()
+{
+if ! grep -q "* hard maxlogins 10" /etc/security/limits.conf ; then
+    echo -e "\e[32mAdding Max-login restrictions.\e[0m"
+    echo '* hard maxlogins 10' >> /etc/security/limits.conf
+else
+    echo -e "\e[34mMax-login restrictions already configured.\e[0m"
+fi
+}
+
+#######################
+#     Remove telnet   #
+#  STIG Vul ID 75797  #
+#######################
+telnet_remove()
+{
+TELNET_CHECK=$(dpkg -s telnet | grep 'deinstall' > /dev/null ; echo "$?")
+if [ "$TELNET_CHECK" != 0 ] ; then
+    echo -e "\e[32mRemoving telnet\e[0m"
+    apt-get -y remove telnet > /dev/null
+else
+    echo -e "\e[34mtelnet already removed.\e[0m"
+fi
+}
+####################################
+#           login defs             #
+#  75561, 75543                    #
+####################################
+login.defs()
+{
+if ! grep -q "PASS_MAX_DAYS   60" /etc/login.defs ; then
+    echo -e "\e[32mAdding password aging restrictions to /etc/login.defs.\e[0m"
+    sed -i 's|PASS_MIN_DAYS.*|PASS_MIN_DAYS   1|g' /etc/login.defs
+    sed -i 's|PASS_MAX_DAYS.*|PASS_MAX_DAYS   60|g' /etc/login.defs 
+    echo "CREATE_HOME yes" >> /etc/login.defs
+else
+    echo -e "\e[34mPassword aging restrictions already configured.\e[0m"
+fi
+#sed -i 's|UMASK.*|UMASK 077|g' /etc/login.defs
+if ! grep -q "umask 077" /etc/profile ; then
+    echo -e "\e[32mAdding UMASK restrictions to /etc/profile.\e[0m"
+    echo "umask 077" >> /etc/profile
+else
+    echo -e "\e[34mUMASK restrictions already configured.\e[0m"
+fi
+}
+################################
+#  Account Inactivity disable
+#  STIG Vul ID: V-75485
+################################
+inactive_accounts()
+{
+useradd -D -f 35
+}
+
+###############################
+#  Account inactivity logout
+# STIG Vul ID: V-75441
+###############################
+inactivity_logout()
+{
+if [ ! -f "/etc/profile.d/autologout.sh" ] ; then
+    echo -e "\e[32mAdding auto-logout script.\e[0m" 
+    printf '#!/bin/bash\nTMOUT=900\nreadonly TMOUT\nexport TMOUT' > /etc/profile.d/autologout.sh
+    chmod 755 /etc/profile.d/autologout.sh
+else
+    echo -e "\e[34mAuto-logout script already configured.\e[0m"
+fi
+}
+#################################################
+#  Set Password Complexity                      #
+#  STIG Vul ID's: V-75449, 75451, 75453,75455,  #
+#  75457, 75475, 75477                          #
+#################################################
+password_complexity()
+{
+if ! grep -q "DoD STIG" /etc/pam.d/common-password ; then 
+    echo -e "\e[32mAdding password complexity requirements to /etc/pam.d/common-password.\e[0m"
+    cp files/dod_common-password /etc/pam.d/common-password
+    dpkg -i deb_packages/libpam-cracklib_1.1.8-3.2ubuntu2_amd64.deb > /dev/null
+else
+    echo -e "\e[34mDoD password complexity requirements already applied.\e[0m"
+fi
+
+if ! grep -q "DoD user password" /usr/sbin/so-user-add ; then 
+    echo -e "\e[32mAdding password complexity requirements to so-user-add and so-user-passwd.\e[0m"
+    cp files/so-user-add-dod /usr/sbin/so-user-add && sudo chmod 755 /usr/sbin/so-user-add
+    cp files/so-user-passwd-dod /usr/sbin/so-user-passwd && sudo chmod 755 /usr/sbin/so-user-passwd
+else
+    echo -e "\e[34mDoD password complexity requirements already applied.\e[0m"
+fi
+
+# Adding dictionary password check requirement
+if ! grep -q "dictcheck=1" /etc/security/pwquality.conf ; then
+    echo -e "\e[32mAdding dictionary check for passwords.\e[0m"
+    echo "dictcheck=1" >> /etc/security/pwquality.conf
+else
+    echo -e "\e[34mDictionary check for passwords already enforced.\e[0m"
+fi
+}
+
+#####################################
+#    PermitUserEnv. in sshd.conf    #
+# Vul ID: V-75833,V-75829,V-75831,  #
+# V-75841, 75827, 75851             #
+#####################################
+sshd_conf()
+{
+if ! grep -q "DoD Stig" /etc/ssh/sshd_config ; then
+    echo -e "\e[32mEnforcing SSH Cipher restrictions in /etc/ssh/sshd_config.\e[0m"
+    sed -i '1 i\# DoD Stig Vul ID: V-75833\nPermitUserEnvironment no\n\n#DoD STIG Vul ID: V-75829\nCiphers aes128-ctr,aes192-ctr,aes256-ctr\n\n#DoD STIG Vul ID: V-75831\nMACs hmac-sha2-256,hmac-sha2-512\n\n#DoD STIG Vul ID: V-75851\nCompression no\n' /etc/ssh/sshd_config
+    sed -i 's|#IgnoreUserKnownHosts yes|IgnoreUserKnownHosts yes|g' /etc/ssh/sshd_config
+    sed -i 's|PermitRootLogin prohibit-password|PermitRootLogin no|g' /etc/ssh/sshd_config
+    systemctl restart sshd.service
+else 
+    echo -e "\e[34mSSH Cipher restrictions already applied.\e[0m"
+fi
+}
+
+#######################################
+#      Ctrl-Alt-Del seq disable       #  
+#  Severity: CAT I | Vul ID: V-80957  #
+#######################################
+ctrl_alt_del()
+{
+if  [ ! -f "/etc/dconf/db/local.d/00-disable-CAD" ] ; then
+    echo -e "\e[32mRemoving ctrl_alt_del sequence.\e[0m"
+    mkdir /etc/dconf/db/local.d/
+    printf '# DoD Stig Vul ID: V-80957\n[org/gnome/settings-daemon/plugins/media-keys]\nlogout="" ' > /etc/dconf/db/local.d/00-disable-CAD
+    dconf update
+else
+    echo -e "\e[34mctrl_alt_del sequence already removed.\e[0m"
+fi
+}
+########################################
+#  USB Mounting disabled               #
+#  Severity: CAT II | Vul ID: V-75531  #
+########################################
+usb_mount_disable()
+{
+if [ ! -f "/etc/modprobe.d/disable_usb_storage.conf" ] ; then
+    echo -e "\e[32mEnforcing no USB policy.\e[0m"
+    echo "install usb-storage /bin/true" >> /etc/modprobe.d/disable_usb_storage.conf
+else
+    echo -e "\e[34mNo USB policy already applied.\e[0m"
+fi
+}
+
+#######################################
+#             NTP maxpoll             #
+# Severity: CAT II | Vul ID: V-75813  #
+#######################################
+ntp_maxpoll()
+{
+if ! grep -q "maxpoll = 17" /etc/ntp.conf ; then
+    echo -e "\e[32mApplying maxpoll to /etc/ntp.conf.\e[0m"
+    echo "maxpoll = 17" >> /etc/ntp.conf
+    systemctl restart ntp
+else 
+    echo -e "\e[34mNTP maxpoll already applied.\e[0m"
+fi
+}
+
+#######################################
+#        TCP syncookies               #
+# Vul ID: V-75869, V-75883, V-75885,  #
+# V-75887,                            #
+#######################################
+sysctl_conf()
+{
+if ! grep -q "DoD STIG" /etc/sysctl.conf ; then
+    echo -e "\e[32mEnforcing IPv4 restrictions to /etc/sysctl.conf\e[0m"
+    sed -i 's|#net.ipv4.tcp_syncookies=1|net.ipv4.tcp_syncookies = 1|g' /etc/sysctl.conf
+    sed -i 's|#net.ipv4.conf.default.accept_redirects = 0|net.ipv4.conf.default.accept_redirects = 0|g' /etc/sysctl.conf
+    sed -i 's|#net.ipv4.conf.all.send_redirects = 0|net.ipv4.conf.all.send_redirects = 0|g' /etc/sysctl.conf
+    sed -i 's|#net.ipv4.ip_forward=1|net.ipv4.ip_forward = 0|g' /etc/sysctl.conf
+    printf '\n#DoD STIG Vul ID: V-75883\nnet.ipv4.conf.default.send_redirects=0\n#DoD STIG Vul ID: V-75881\nnet.ipv4.conf.all.accept_redirects=0' >> /etc/sysctl.conf
+    # Force sysctl changes without reboot
+    sudo sysctl -p > /dev/null
+else
+    echo -e "\e[34mIPv4 restrictions already applied.\e[0m"
+fi
+}
+
+########################################
+#              auditd                  #
+#  Vul ID: V-75617,75627, 75629, 75661 #
+#  75663, 75665, 75667, 75687, 75859 
+########################################
+auditd()
+{
+# Installing auditd deb packages + dependences
+#Set Max_log_file_action from Rotate to Syslog
+if [ ! -f "/etc/audit/auditd.conf" ] ; then
+    echo -e "\e[32mApplying auditd settings.\e[0m"
+    dpkg -i deb_packages/libauparse0_2.4.5-1ubuntu2.1_amd64.deb > /dev/null
+    dpkg -i deb_packages/auditd_2.4.5-1ubuntu2_amd64.deb >  /dev/null
+    dpkg -i deb_packages/libprelude2v5_1.0.0-11.7ubuntu1_amd64.deb > /dev/null
+    dpkg -i deb_packages/audispd-plugins_2.4.5-1ubuntu2_amd64.deb > /dev/null
+    sed -i 's|max_log_file_action = ROTATE|max_log_file_action = SYSLOG|g' /etc/audit/auditd.conf
+    sed -i 's|disk_full_action = SUSPEND|disk_full_action = HALT|g' /etc/audit/auditd.conf
+    sed -i 's|disk_full_action = ignore|disk_full_action = SYSLOG|g' /etc/audisp/audisp-remote.conf
+    sed -i 's|##enable_krb5 = no|enable_krb5 = yes|g' /etc/audisp/audisp-remote.conf
+    sed -i 's|network_failure_action = stop|network_failure_action = halt|g' /etc/audisp/audisp-remote.conf
+    printf '\n#DoD STIG Vul ID: V-75859\nnetwork_failure_action = stop' >> /etc/audisp/audisp-remote.conf
+# All required audit rules have been consolidated in the audit.rules files
+    cp files/audit.rules /etc/audit/audit.rules
+    systemctl restart auditd.service
+else
+    echo -e "\e[34mAuditd settings already applied.\e[0m"
+fi
+}
+
+##########################################
+#               PKI Packages             #
+# Vul ID: V-75903, 75905
+##########################################
+pki_packages()
+{
+PKI_CHECK=$(dpkg -s opensc-pkcs11 | grep 'deinstall' > /dev/null ; echo "$?")
+if [ "$PKI_CHECK" == 0 ] ; then
+    echo -e "\e[32mInstalling PKI packages.\e[0m"
+    dpkg -i deb_packages/opensc-pkcs11_0.15.0-1ubuntu1_amd64.deb > /dev/null
+    dpkg -i deb_packages/libpam-pkcs11_0.6.8-4_amd64.deb > /dev/null
+else 
+    echo -e "\e[34mPKI packages already installed.\e[0m"
+fi
+}
+
+############################################
+#  /etc/sudoers.d/securityonion-onionsalt  #
+#  Vul ID: V-75489	                       #
+############################################
+sudoers_config()
+{
+if grep -q "NOPASSWD" /etc/sudoers.d/securityonion-onionsalt ; then 
+    echo -e "\e[32mEnforcing password requirements for /etc/sudoers.d/securityonion-onionsalt\e[0m"
+    sed -i 's|NOPASSWD|PASSWD|g' /etc/sudoers.d/securityonion-onionsalt
+else
+    echo -e "\e[34mPassword requirements already applied to /etc/sudoers.d/securityonion-onionsalt\e[0m"
+fi
+}
+
+###################################
+#  Vlock Virtual Console locking  #
+#  Vul ID: V-75439                #
+###################################
+vlock_config()
+{
+VLOCK_CHECK=$(dpkg -s vlock | grep 'deinstall' > /dev/null ; echo "$?")
+if [ "$VLOCK_CHECK" == 0 ] ; then
+    echo -e "\e[32mInstalling vlock.\e[0m"
+    dpkg -i deb_packages/vlock_2.2.2-5_amd64.deb > /dev/null
+else
+    echo -e "\e[34mvlock already installed.\e[0m"
+fi
+}
+####################################
+#    Wuzah/OSSEC Active Response   #
+#    STIG Vul ID: V-75487          #
+####################################
+wuzah_rule()
+{
+#remove the "/ossec_config" string that closes ossec_config xml element from the end of the ossec.conf file.
+if ! grep -q "STIG Vul" /var/ossec/etc/ossec.conf ; then 
+    echo -e "\e[32mEnforcing account lock after 3 failed login attempts for apache.\e[0m"
+    sed -i 's|</ossec_config>||g' /var/ossec/etc/ossec.conf
+    printf '\n# STIG Vul ID: V-75487\n<command>\n<name>disable-sguild-account</name>\n<executable>disable-sguild-account.sh</executable>\n<expect>user</expect>\n<timeout_allowed>yes</timeout_allowed>\n</command>\n' >> /var/ossec/etc/ossec.conf 
+    printf '\n<active-response>\n<!-- This response is going to execute the disable-sguild-account.\n- command for every event that fires rule 111127\n- This will disable to users access to kibana/squil/squert\n- to renable it the user must change his/her password using so-user-passwd\n-->\n<command>disable-sguild-account</command>\n<location>local</location>\n<rules_id>111127</rules_id>\n</active-response>\n' >> /var/ossec/etc/ossec.conf
+# close the ossec_config xml element in the ossec.conf file
+    printf '\n</ossec_config>' >> /var/ossec/etc/ossec.conf
+# Added upstream after 16.04.5.5
+    chmod 755 wazuh_ossec/disable-sguild-account.sh && chown root:root wazuh_ossec/disable-sguild-account.sh
+    cp wazuh_ossec/disable-sguild-account.sh /var/ossec/active-response/bin/
+    so-ossec-restart > /dev/null && so-ossec-agent-restart > /dev/null
+else
+    echo -e "\e[34mAccount lock for failed apache login attempts already configured.\e[0m"
+fi
+}
+
+###################
+#  Reboot Option  #
+###################
+reboot_question()
+{
+echo""
+echo "DoD Stigs have been enforeced on this machine.  Some of the changes will require a reboot."
+echo ""
+echo "Would you like to reboot now? (Y/n)"
+read user_reboot_option
+if [ ${user_reboot_option,,} != "y" ] ; then
+    echo -e "\e[32mPlease reboot at your ealiest convenience.\e[0m"
+    exit
+else 
+    echo ""
+    echo -e "\e[34msystem is rebooting!\e[0m"
+    sudo reboot
+fi
+}
+####################################
+# Sticky bit on World Writable Dir #
+#       STIG Vul ID's: 75811       #
+####################################
+sticky_bit()
+{
+echo -e "\e[32m**Checking if World Writable Directories have stick bit set.\e[0m"
+find / -type d \( -perm -0002 -a ! -perm -1000 \) > sticky_bit_check 2>/dev/null
+if [ -s sticky_bit_check ]; then
+    echo "Found $(cat sticky_bit_check | sort -u | wc -l) World Writable Directories with the sticky bit NOT set.)"
+    echo ""
+    echo "Would you like to apply the stick bit now?(Y/n)"
+    read sticky_bit_input
+    if [ ${sticky_bit_input,,} == "y" ] ; then
+        for i in $(cat sticky_bit_check); do
+            chmod 1777 $i
+        done
+    rm -rf sticky_bit_check
+    echo -e "\e[34mSticky bit has been set on all World Writable Directories.\e[0m"
+    else
+	echo "STIG Vul ID 75811 will remain a finding until the stick bit is set on the directorys located in the sticky_bit_check file."
+    fi          
+else
+    echo -e "\e[34mSticky bit has been set on all World Writable Directories.\e[0m"
+fi
+}
+
+#################################
+#      user/group ownership     #
+#  STIG Vul ID's: 75555, 75557  #
+#################################
+file_ownership()
+{
+INVALID_USER_CHECK=$(locate invalid_user_group)
+echo -e "\e[32m**Checking filesystem to ensure all files have valid owners and groups.\e[0m"
+echo -e "\e[32mThis may take a while.\e[0m"
+find / -nogroup > invalid_user_group_temp 2>/dev/null
+find / -nouser  >> invalid_user_group_temp 2>/dev/null
+cat invalid_user_group_temp | sort -u > invalid_user_group
+rm invalid_user_group_temp > /dev/null
+if [ -s invalid_user_group ]; then
+    echo ""
+    echo "Found $(cat invalid_user_group | sort -u | wc -l) files that did not have a valid user or group."
+    echo ""
+    echo "A list of all files with an invalid user/group can be found at $invalid_user_group."
+    echo ""   
+    echo "Below are the timeframes per node type:"
+    echo "Master Node: approx 5 min"
+    echo "Storage Node: approx 5 mins"
+    echo "Forward Nodes: approx 30 min"
+    echo "Would you like to assign root as the user and group now? (Y/n)"
+    read user_file_input
+       if [ ${user_file_input,,} == "y" ] ; then
+           for file in $(cat invalid_user_group); do
+               chown root:root $file
+           done
+
+           echo -e "\e[34mAll files have valid User/Group assigned.\e[0m"
+       else
+           echo "STIG Vul ID's: 75555, 75557 will remain a finding until approprate file permissions have been assigned to the files listed in the invalid_user_group file"
+       fi
+else 
+    echo -e "\e[34mAll files have valid User/Group assigned.\e[0m"
+fi
+}
+#################################
+#  Advance package Tool (APT)   #
+#  STIG Vul ID's: 75527,        #
+#################################
+apt_tool()
+{
+if ! grep -q 'Remove-Unused-Dependencies "true"' /etc/apt/apt.conf.d/50unattended-upgrades ; then
+    echo -e "\e[32mConfiguring Advance package Tool.\e[0m"
+    sed -i 's|Remove-Unused-Dependencies "false"|Remove-Unused-Dependencies "true"|g' /etc/apt/apt.conf.d/50unattended-upgrades
+else
+    echo -e "\e[34mAdvance Package Tool already configured.\e[0m"
+fi
+}
+
+#################################
+#  Where the Magic Happens !!!  #
+#################################
+welcome_script
+login_banner
+common_auth
+max_login_limit
+telnet_remove
+login.defs
+inactive_accounts
+inactivity_logout
+password_complexity
+sshd_conf
+ctrl_alt_del
+usb_mount_disable
+ntp_maxpoll
+sysctl_conf
+auditd
+pki_packages
+sudoers_config
+vlock_config
+wuzah_rule
+file_ownership
+sticky_bit
+apt_tool
+reboot_question
