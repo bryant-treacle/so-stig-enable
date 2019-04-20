@@ -187,7 +187,7 @@ fi
 #################################################
 password_complexity()
 {
-if ! grep -q "DoD STIG" /etc/pam.d/common-password ; then 
+if ! grep -q "DoD password" /etc/pam.d/common-password ; then 
     echo -e "\e[32mAdding password complexity requirements to /etc/pam.d/common-password.\e[0m"
     cp files/dod_common-password /etc/pam.d/common-password
     dpkg -i deb_packages/libpam-cracklib_1.1.8-3.2ubuntu2_amd64.deb > /dev/null
