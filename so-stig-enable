@@ -332,7 +332,7 @@ fi
 ##########################################
 pki_packages()
 {
-PKI_CHECK=$(dpkg -s opensc-pkcs11 | grep 'install ok installed' > /dev/null ; echo "$?")
+PKI_CHECK=$(dpkg -s opensc-pkcs11 2> /dev/null | grep 'install ok installed' > /dev/null ; echo "$?")
 if [ "$PKI_CHECK" == 1 ] ; then
     echo -e "\e[32mInstalling PKI packages.\e[0m"
     dpkg -i deb_packages/opensc-pkcs11_0.15.0-1ubuntu1_amd64.deb > /dev/null
@@ -362,7 +362,7 @@ fi
 ###################################
 vlock_config()
 {
-VLOCK_CHECK=$(dpkg -s vlock | grep 'install ok installed' > /dev/null ; echo "$?")
+VLOCK_CHECK=$(dpkg -s vlock 2> /dev/null | grep 'install ok installed' > /dev/null ; echo "$?")
 if [ "$VLOCK_CHECK" == 1 ] ; then
     echo -e "\e[32mInstalling vlock.\e[0m"
     dpkg -i deb_packages/vlock_2.2.2-5_amd64.deb > /dev/null
