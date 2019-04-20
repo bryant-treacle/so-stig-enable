@@ -1,0 +1,12 @@
+/var/log/audit/audit.log {
+    daily
+    rotate 7
+    copytruncate
+    compress
+    missingok
+    notifempty
+    sharedscripts
+    postrotate
+	invoke-rc.d auditd restart
+    endscript
+}
