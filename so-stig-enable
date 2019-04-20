@@ -445,18 +445,18 @@ fi
 #################################
 file_ownership()
 {
-INVALID_USER_CHECK=$(locate invalid_user_group)
 echo -e "\e[32m**Checking filesystem to ensure all files have valid owners and groups.\e[0m"
 echo -e "\e[32mThis may take a while.\e[0m"
 find / -nogroup > invalid_user_group_temp 2>/dev/null
 find / -nouser  >> invalid_user_group_temp 2>/dev/null
 cat invalid_user_group_temp | sort -u > invalid_user_group
 rm invalid_user_group_temp > /dev/null
+INVALID_USER_CHECK=$(locate invalid_user_group)
 if [ -s invalid_user_group ]; then
     echo ""
     echo "Found $(cat invalid_user_group | sort -u | wc -l) files that did not have a valid user or group."
     echo ""
-    echo "A list of all files with an invalid user/group can be found at $invalid_user_group."
+    echo "A list of all files with an invalid user/group can be found at $INVALID_USER_CHECK."
     echo ""   
     echo "Below are the timeframes per node type:"
     echo "Master Node: approx 5 min"
@@ -471,7 +471,7 @@ if [ -s invalid_user_group ]; then
 
            echo -e "\e[34mAll files have valid User/Group assigned.\e[0m"
        else
-           echo "STIG Vul ID's: 75555, 75557 will remain a finding until approprate file permissions have been assigned to the files listed in the invalid_user_group file"
+           echo "STIG Vul ID's: 75555, 75557 will remain a finding until approprate file permissions have been assigned to the files listed in the $INVALID_USER_CHECK file"
        fi
 else 
     echo -e "\e[34mAll files have valid User/Group assigned.\e[0m"
