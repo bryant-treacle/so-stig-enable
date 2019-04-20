@@ -197,8 +197,8 @@ fi
 
 if ! grep -q "DoD user password" /usr/sbin/so-user-add ; then 
     echo -e "\e[32mAdding password complexity requirements to so-user-add and so-user-passwd.\e[0m"
-    cp files/so-user-add-dod /usr/sbin/so-user-add && sudo chmod 755 /usr/sbin/so-user-add > /dev/null
-    cp files/so-user-passwd-dod /usr/sbin/so-user-passwd && sudo chmod 755 /usr/sbin/so-user-passwd > /dev/null
+    cp files/so-user-add-dod /usr/sbin/so-user-add && sudo chmod 755 /usr/sbin/so-user-add 2> /dev/null
+    cp files/so-user-passwd-dod /usr/sbin/so-user-passwd && sudo chmod 755 /usr/sbin/so-user-passwd 2> /dev/null
 else
     echo -e "\e[34mDoD password complexity requirements already applied.\e[0m"
 fi
