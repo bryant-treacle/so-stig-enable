@@ -224,7 +224,7 @@ if ! grep -q "DoD Stig" /etc/ssh/sshd_config ; then
     sed -i '1 i\# DoD Stig Vul ID: V-75833\nPermitUserEnvironment no\n\n#DoD STIG Vul ID: V-75829\nCiphers aes128-ctr,aes192-ctr,aes256-ctr\n\n#DoD STIG Vul ID: V-75831\nMACs hmac-sha2-256,hmac-sha2-512\n\n#DoD STIG Vul ID: V-75851\nCompression no\n' /etc/ssh/sshd_config
     sed -i 's|#IgnoreUserKnownHosts yes|IgnoreUserKnownHosts yes|g' /etc/ssh/sshd_config
     sed -i 's|PermitRootLogin prohibit-password|PermitRootLogin no|g' /etc/ssh/sshd_config
-    systemctl resatart sshd.service
+    systemctl restart sshd.service
 else 
     echo -e "\e[34mSSH Cipher restrictions already applied.\e[0m"
 fi
