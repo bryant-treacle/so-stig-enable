@@ -197,8 +197,8 @@ fi
 
 if ! grep -q "DoD user password" /usr/sbin/so-user-add ; then 
     echo -e "\e[32mAdding password complexity requirements to so-user-add and so-user-passwd.\e[0m"
-    cp files/so-user-add-dod /usr/sbin/so-user-add && sudo chmod 755 /usr/sbin/so-user-add
-    cp files/so-user-passwd-dod /usr/sbin/so-user-passwd && sudo chmod 755 /usr/sbin/so-user-passwd
+    cp files/so-user-add-dod /usr/sbin/so-user-add && sudo chmod 755 /usr/sbin/so-user-add > /dev/null
+    cp files/so-user-passwd-dod /usr/sbin/so-user-passwd && sudo chmod 755 /usr/sbin/so-user-passwd > /dev/null
 else
     echo -e "\e[34mDoD password complexity requirements already applied.\e[0m"
 fi
@@ -332,8 +332,8 @@ fi
 ##########################################
 pki_packages()
 {
-PKI_CHECK=$(dpkg -s opensc-pkcs11 | grep 'deinstall' > /dev/null ; echo "$?")
-if [ "$PKI_CHECK" == 0 ] ; then
+PKI_CHECK=$(dpkg -s opensc-pkcs11 | grep 'install ok installed' > /dev/null ; echo "$?")
+if [ "$PKI_CHECK" == 1 ] ; then
     echo -e "\e[32mInstalling PKI packages.\e[0m"
     dpkg -i deb_packages/opensc-pkcs11_0.15.0-1ubuntu1_amd64.deb > /dev/null
     dpkg -i deb_packages/libpam-pkcs11_0.6.8-4_amd64.deb > /dev/null
@@ -362,8 +362,8 @@ fi
 ###################################
 vlock_config()
 {
-VLOCK_CHECK=$(dpkg -s vlock | grep 'deinstall' > /dev/null ; echo "$?")
-if [ "$VLOCK_CHECK" == 0 ] ; then
+VLOCK_CHECK=$(dpkg -s vlock | grep 'install ok installed' > /dev/null ; echo "$?")
+if [ "$VLOCK_CHECK" == 1 ] ; then
     echo -e "\e[32mInstalling vlock.\e[0m"
     dpkg -i deb_packages/vlock_2.2.2-5_amd64.deb > /dev/null
 else
