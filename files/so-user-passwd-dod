@@ -44,7 +44,7 @@ dod_user_pass()
 echo "Please enter a password following DoD guidance."
 read -s -p "User Password: " USER_PASS
 #Check if the password Length is greater or equal to 15 characters
-if [[ ${USER_PASS} -ge 15 ]]; then
+if [[ ${#USER_PASS} -ge 15 ]]; then
     # Check if the password has at least 2 upper case letters
     if [[ "$USER_PASS" =~ (.*[A-Z].*){2} ]]; then
         # Check if the password has at least 2 digits
