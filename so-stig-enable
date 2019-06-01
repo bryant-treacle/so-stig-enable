@@ -150,12 +150,12 @@ else
     echo -e "\e[34mPassword aging restrictions already configured.\e[0m"
 fi
 #sed -i 's|UMASK.*|UMASK 077|g' /etc/login.defs
-if ! grep -q "umask 077" /etc/profile ; then
-    echo -e "\e[32mAdding UMASK restrictions to /etc/profile.\e[0m"
-    echo "umask 077" >> /etc/profile
-else
-    echo -e "\e[34mUMASK restrictions already configured.\e[0m"
-fi
+#if ! grep -q "umask 077" /etc/profile ; then
+#    echo -e "\e[32mAdding UMASK restrictions to /etc/profile.\e[0m"
+#    echo "umask 077" >> /etc/profile
+#else
+#    echo -e "\e[34mUMASK restrictions already configured.\e[0m"
+#fi
 }
 ################################
 #  Account Inactivity disable
