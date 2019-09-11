@@ -45,7 +45,7 @@ This script will add additional the below controls to Security Onion 16.04.x in 
     A copy of the unclassified STIG Viewer and completed checklist has been included in the Repo.  
     NOTE: The STIG View does require a java runtime environment in order to launch.  
 
-    ![alt text]https://github.com/bryant-treacle/so-stig-enable/blob/master/images/Security_Onion_STIG_totals.png
+![alt text](https://github.com/bryant-treacle/so-stig-enable/blob/master/images/Security_Onion_STIG_totals.png
 ## Login Banner:
     - Add SSH, Web, and Desktop Environment DoD consent banners prior to granting user access to the system.
     - Enforce DoD password policies to local user and Kibana/Sguil/Squert accounts.
